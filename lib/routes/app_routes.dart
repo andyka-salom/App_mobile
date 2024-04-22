@@ -3,6 +3,7 @@ import '../presentation/app_navigation_screen/app_navigation_screen.dart';
 import '../presentation/home_container_screen/home_container_screen.dart';
 import '../presentation/signin_screen_one_screen.dart';
 import '../presentation/signup_page_one_screen.dart';
+import '../presentation/personal_info_page_screen.dart';
 import '../presentation/splash_screen.dart'; // ignore_for_file: must_be_immutable
 
 
@@ -24,9 +25,10 @@ class AppRoutes {
   static Map<String, WidgetBuilder> routes = {
     splashScreen: (context) => SplashScreen(),
     signinScreenOneScreen: (context) => SigninScreenOneScreen(),
+     '/personal_info': (context) => PersonalInfoPageScreen(),
     signupPageOneScreen: (context) => SignupPageOneScreen(),
     homeContainerScreen: (context) => HomeContainerScreen(),
     appNavigationScreen: (context) => AppNavigationScreen(),
-    initialRoute: (context) => SplashScreen()
+    initialRoute: (context) => PersonalInfoPageScreen()
   };
 }

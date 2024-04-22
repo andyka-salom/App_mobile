@@ -158,6 +158,19 @@ class PrimaryColors {
   Color get gray5001 => Color(0XFFF1F8FF);
   Color get gray600 => Color(0XFF828282);
   Color get gray800 => Color(0XFF4F4F4F);
-// Indigo
   Color get indigoA200 => Color(0XFF736CFB);
+  Color get blue300 => Color(0XFF66AAFF);
+  Color get blue40001 => Color(0XFF509EE5);
+  Color get blue5001 => Color(0XFFECF3FB);
+  Color get blueA100 => Color(0XFF7BAFFF);
+  Color get blueGray50 => Color(0XFFEFEFF1);
+  Color get blueGray5001 => Color(0XFFEAEBF0);
+  Color get blueGray900 => Color(0XFF323539);
+  Color get gray300 => Color(0XFFE0E0E0);
+  Color get gray30077 => Color(0X77E6E6E6);
+  Color get gray80014 => Color(0X143D3D3D);
+  Color get greenA200 => Color(0XFF7CFFB8);
+  Color get indigoA2000f => Color(0X0F6875E6);
+  Color get red100 => Color(0XFFFFD5D5);
+  Color get whiteA700 => Color(0XFFFFFFFF);
 }

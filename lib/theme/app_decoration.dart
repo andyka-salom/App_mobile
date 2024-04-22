@@ -38,6 +38,21 @@ class AppDecoration {
           strokeAlign: BorderSide.strokeAlignCenter,
         ),
       );
+        static BoxDecoration get outlineGray200 => BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: appTheme.gray200,
+            width: 3.h,
+          ),
+        ),
+      );
+      static BoxDecoration get gradientRedToGreenA => BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment(0.5, 0),
+          end: Alignment(0.5, 1),
+          colors: [appTheme.red100, appTheme.blueA100, appTheme.greenA200],
+        ),
+      );
 }
 
 class BorderRadiusStyle {
@@ -55,5 +70,24 @@ class BorderRadiusStyle {
 // Rounded borders
   static BorderRadius get roundedBorder15 => BorderRadius.circular(
         15.h,
+      );
+        static BorderRadius get circleBorder37 => BorderRadius.circular(
+        37.h,
+      );
+  static BorderRadius get circleBorder59 => BorderRadius.circular(
+        59.h,
+      );
+  static BorderRadius get circleBorder66 => BorderRadius.circular(
+        66.h,
+      );
+  static BorderRadius get circleBorder72 => BorderRadius.circular(
+        72.h,
+      );
+// Rounded borders
+  static BorderRadius get roundedBorder20 => BorderRadius.circular(
+        20.h,
+      );
+  static BorderRadius get roundedBorder30 => BorderRadius.circular(
+        30.h,
       );
 }
