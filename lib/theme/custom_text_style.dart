@@ -8,7 +8,13 @@ extension on TextStyle {
     );
   }
 
+  TextStyle get roboto {
+    return copyWith(
+      fontFamily: 'Roboto',
+    );
+  }
 }
+
 
 class CustomTextStyles {
   // Body text style
@@ -51,6 +57,12 @@ class CustomTextStyles {
   static get titleMediumGray50001 => theme.textTheme.titleMedium!.copyWith(
         color: appTheme.gray50001,
         fontSize: 18.fSize,
+      );
+        static get titleMediumRobotoBlack900 =>
+      theme.textTheme.titleMedium!.roboto.copyWith(
+        color: appTheme.black900,
+        fontSize: 16.fSize,
+        fontWeight: FontWeight.w700,
       );
         static get titleMediumBluegray900 => theme.textTheme.titleMedium!.copyWith(
         color: appTheme.blueGray900,

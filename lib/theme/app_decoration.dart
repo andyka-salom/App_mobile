@@ -15,6 +15,16 @@ class AppDecoration {
   static BoxDecoration get fillPrimary => BoxDecoration(
         color: theme.colorScheme.primary,
       );
+        static BoxDecoration get fillBlue50 => BoxDecoration(
+        color: appTheme.blue50,
+      );
+        static BoxDecoration get fillBlue => BoxDecoration(
+        color: appTheme.blue5001,
+      );
+      static BoxDecoration get outlineGray => BoxDecoration(
+        color: appTheme.whiteA700,
+      );
+
 // Outline decorations
   static BoxDecoration get outlineBlack => BoxDecoration(
         color: theme.colorScheme.onPrimary,
@@ -53,6 +63,49 @@ class AppDecoration {
           colors: [appTheme.red100, appTheme.blueA100, appTheme.greenA200],
         ),
       );
+        static BoxDecoration get outlineOnPrimary => BoxDecoration(
+        color: appTheme.blue5001,
+        boxShadow: [
+          BoxShadow(
+            color: theme.colorScheme.onPrimary,
+            spreadRadius: 2.h,
+            blurRadius: 2.h,
+            offset: Offset(
+              0,
+              11,
+            ),
+          )
+        ],
+      );
+      static BoxDecoration get outlineIndigoAF => BoxDecoration(
+        color: appTheme.whiteA700,
+        boxShadow: [
+          BoxShadow(
+            color: appTheme.indigoA2000f,
+            spreadRadius: 2.h,
+            blurRadius: 2.h,
+            offset: Offset(
+              0,
+              6,
+            ),
+          )
+        ],
+      );
+        static BoxDecoration get outlineGray30077 => BoxDecoration(
+        color: appTheme.whiteA700,
+        boxShadow: [
+          BoxShadow(
+            color: appTheme.gray30077,
+            spreadRadius: 2.h,
+            blurRadius: 2.h,
+            offset: Offset(
+              0,
+              4,
+            ),
+          )
+        ],
+      );
+      
 }
 
 class BorderRadiusStyle {

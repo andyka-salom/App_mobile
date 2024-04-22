@@ -4,6 +4,9 @@ import '../presentation/home_container_screen/home_container_screen.dart';
 import '../presentation/signin_screen_one_screen.dart';
 import '../presentation/signup_page_one_screen.dart';
 import '../presentation/personal_info_page_screen.dart';
+import '../presentation/profil_screen.dart';
+import '../presentation/serviceadd.dart';
+import '../presentation/service_category.dart';
 import '../presentation/splash_screen.dart'; // ignore_for_file: must_be_immutable
 
 
@@ -26,9 +29,12 @@ class AppRoutes {
     splashScreen: (context) => SplashScreen(),
     signinScreenOneScreen: (context) => SigninScreenOneScreen(),
      '/personal_info': (context) => PersonalInfoPageScreen(),
+     '/profil': (context) => ProfilScreen(),
+     '/serviceadd': (context) => ServiceAddScreen(),
+     '/servicecategory': (context) => ServiceCategoryScreen(),
     signupPageOneScreen: (context) => SignupPageOneScreen(),
     homeContainerScreen: (context) => HomeContainerScreen(),
     appNavigationScreen: (context) => AppNavigationScreen(),
-    initialRoute: (context) => PersonalInfoPageScreen()
+    initialRoute: (context) => ServiceCategoryScreen()
   };
 }

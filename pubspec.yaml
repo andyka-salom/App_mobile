@@ -10,6 +10,7 @@ dependencies:
     sdk: flutter
   cached_network_image: ^3.3.0
   flutter_svg: ^2.0.9
+  dotted_border: ^2.1.0
   intl: ^0.18.0
   connectivity_plus: ^5.0.2
 dev_dependencies: 
@@ -20,9 +21,9 @@ flutter:
   assets: 
     - assets/
     - assets/images/
-  fonts: 
+  fonts:
     - family: Josefin Sans
-      fonts: 
+      fonts:
         - asset: assets/fonts/JosefinSansBold.ttf
           weight: 700
         - asset: assets/fonts/JosefinSansRegular.ttf
@@ -32,6 +33,10 @@ flutter:
         - asset: assets/fonts/JosefinSansMedium.ttf
           weight: 500
     - family: Noto Sans
-      fonts: 
+      fonts:
         - asset: assets/fonts/NotoSansRegular.ttf
           weight: 400
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/RobotoRomanBold.ttf
+          weight: 700
