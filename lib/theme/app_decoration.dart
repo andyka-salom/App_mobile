@@ -24,7 +24,25 @@ class AppDecoration {
       static BoxDecoration get outlineGray => BoxDecoration(
         color: appTheme.whiteA700,
       );
-
+  static BoxDecoration get outlineBlueGray => BoxDecoration(
+        color: theme.colorScheme.onPrimary,
+        border: Border.all(
+          color: appTheme.blueGray50,
+          width: 1.h,
+          strokeAlign: BorderSide.strokeAlignOutside,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: theme.colorScheme.onPrimaryContainer,
+            spreadRadius: 2.h,
+            blurRadius: 2.h,
+            offset: Offset(
+              0,
+              2,
+            ),
+          )
+        ],
+      );
 // Outline decorations
   static BoxDecoration get outlineBlack => BoxDecoration(
         color: theme.colorScheme.onPrimary,
@@ -105,6 +123,13 @@ class AppDecoration {
           )
         ],
       );
+        static BoxDecoration get outlineBluegray600 => BoxDecoration(
+        color: theme.colorScheme.onPrimary,
+        border: Border.all(
+          color: appTheme.blueGray600,
+          width: 1.h,
+        ),
+      );
       
 }
 
@@ -115,6 +140,9 @@ class BorderRadiusStyle {
       );
   static BorderRadius get circleBorder42 => BorderRadius.circular(
         42.h,
+      );
+        static BorderRadius get circleBorder28 => BorderRadius.circular(
+        28.h,
       );
 // Custom borders
   static BorderRadius get customBorderLR20 => BorderRadius.horizontal(

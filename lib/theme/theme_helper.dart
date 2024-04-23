@@ -73,6 +73,7 @@ class ThemeHelper {
         space: 1,
         color: appTheme.gray600,
       ),
+      
     );
   }
 

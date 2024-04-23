@@ -21,6 +21,13 @@ class CustomTextStyles {
   static get bodyLargeGray50001 => theme.textTheme.bodyLarge!.copyWith(
         color: appTheme.gray50001,
       );
+      
+        static get bodyLarge18 => theme.textTheme.bodyLarge!.copyWith(
+        fontSize: 18.fSize,
+      );
+        static get titleMediumIndigoA200_1 => theme.textTheme.titleMedium!.copyWith(
+        color: appTheme.indigoA200,
+      );
   static get bodyLargeGray50001_1 => theme.textTheme.bodyLarge!.copyWith(
         color: appTheme.gray50001,
       );
