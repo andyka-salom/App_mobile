@@ -8,7 +8,7 @@ import '../presentation/serviceadd.dart';
 import '../presentation/service_category.dart';
 import '../presentation/detail_order_screen.dart';
 import '../presentation/home_page/home_page.dart';
-import '../presentation/service_container_screen/service_container_screen.dart';
+// import '../presentation/service_container_screen/service_container_screen.dart';
 import '../presentation/order_recent_screen.dart';
 import '../presentation/order_screen.dart';
 import '../presentation/splash_screen.dart'; 
@@ -54,7 +54,7 @@ class AppRoutes {
      '/detail_order': (context) => DetailOrderScreen(), 
     homePage: (context) => HomePage(), //ganti dengan yg baru
     orderRecentScreen: (context) => OrderRecentScreen(),
-        serviceContainerScreen: (context) => ServiceContainerScreen(),
+        // serviceContainerScreen: (context) => ServiceContainerScreen(),
     signupPageOneScreen: (context) => SignupPageOneScreen(),
     homeContainerScreen: (context) => HomeContainerScreen(),
     initialRoute: (context) => SplashScreen()

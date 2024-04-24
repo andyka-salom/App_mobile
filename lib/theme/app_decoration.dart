@@ -171,4 +171,7 @@ class BorderRadiusStyle {
   static BorderRadius get roundedBorder30 => BorderRadius.circular(
         30.h,
       );
+        static BorderRadius get roundedBorder5 => BorderRadius.circular(
+        -5.h,
+      );
 }

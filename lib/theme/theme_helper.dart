@@ -123,6 +123,7 @@ class TextThemes {
           fontFamily: 'Josefin Sans',
           fontWeight: FontWeight.w600,
         ),
+        
       );
 }
 

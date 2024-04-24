@@ -5,6 +5,31 @@ import '../core/app_export.dart';
 import '../widgets/custom_checkbox_button.dart';
 import '../widgets/custom_elevated_button.dart';
 import '../widgets/custom_text_form_field.dart'; // ignore_for_file: must_be_immutable
+class User {
+  final int id;
+  final String username;
+  final String email;
+  final String token;
+  final String photoUrl;
+
+  User({
+    required this.id,
+    required this.username,
+    required this.email,
+    required this.token,
+    required this.photoUrl,
+  });
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      id: json['user']['id'],
+      username: json['user']['username'],
+      email: json['user']['email'],
+      token: json['token'],
+      photoUrl: json['user']['photo_url'],
+    );
+  }
+}
 
 class SigninScreenOneScreen extends StatelessWidget {
   SigninScreenOneScreen({Key? key}) : super(key: key);
@@ -156,30 +181,37 @@ class SigninScreenOneScreen extends StatelessWidget {
     Navigator.pushNamed(context, AppRoutes.signupPageOneScreen);
   }
 
-  void _submitLogin(BuildContext context) async {
-    if (_formKey.currentState!.validate()) {
-      final email = emailController.text.trim();
-      final password = passwordController.text.trim();
+User? loggedInUser; // Deklarasi variabel global
 
-      // Perform login API call
-      final response = await http.post(
-        Uri.parse('http://10.0.2.2:5000/login'),
-        body: json.encode({'email': email, 'password': password}),
-        headers: {'Content-Type': 'application/json'},
-      );
+void _submitLogin(BuildContext context) async {
+  if (_formKey.currentState!.validate()) {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
 
-      if (response.statusCode == 200) {
+    final response = await http.post(
+      Uri.parse('http://10.0.2.2:5000/login'),
+      body: json.encode({'email': email, 'password': password}),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      loggedInUser = User.fromJson(responseData); 
+        print('User ID: ${loggedInUser!.id}');
+  print('Username: ${loggedInUser!.username}');
+  print('Email: ${loggedInUser!.email}');
+  print('Token: ${loggedInUser!.token}');
+  print('Photo URL: ${loggedInUser!.photoUrl}');// Menyimpan user yang masuk
       Navigator.pushReplacementNamed(context, '/home_page');
-    }
- else {
-        // Login failed, show an error message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Login failed. Please check your credentials.'),
-            backgroundColor: Colors.red,
-          ),
-        );
+    } else {
+            // Login failed, show an error message
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Login failed. Please check your credentials.'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        }
       }
     }
-  }
-}
