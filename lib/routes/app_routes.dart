@@ -10,7 +10,8 @@ import '../presentation/detail_order_screen.dart';
 import '../presentation/home_page/home_page.dart';
 import '../presentation/service_container_screen/service_container_screen.dart';
 import '../presentation/order_recent_screen.dart';
-import '../presentation/splash_screen.dart'; // ignore_for_file: must_be_immutable
+import '../presentation/order_screen.dart';
+import '../presentation/splash_screen.dart'; 
 
 
 class AppRoutes {
@@ -30,9 +31,13 @@ class AppRoutes {
 
   static const String newPage = '/detail_order';
 
-  static const String ServicePage = '/service_page';
+  static const String ServicePage = '/service_page'; //halaman service
 
-  static const String orderRecentScreen = '/order_recent_screen';
+  static const String Profile = '/profil'; //halaman service
+
+  static const String orderscreen = '/order_screen';
+
+  static const String orderRecentScreen = '/order_recent_screen'; //history order
 
   static const String initialRoute = '/initialRoute';
 
@@ -41,16 +46,17 @@ class AppRoutes {
   static Map<String, WidgetBuilder> routes = {
     splashScreen: (context) => SplashScreen(),
     signinScreenOneScreen: (context) => SigninScreenOneScreen(),
+    orderscreen:(context) => OrderScreen(),
      '/personal_info': (context) => PersonalInfoPageScreen(),
-     '/profil': (context) => ProfilScreen(),
+     Profile: (context) => ProfilScreen(), //profil
      '/serviceadd': (context) => ServiceAddScreen(),
      '/servicecategory': (context) => ServiceCategoryScreen(),
      '/detail_order': (context) => DetailOrderScreen(), 
-     '/home_page': (context) => HomePage(), //ganti dengan yg baru
+    homePage: (context) => HomePage(), //ganti dengan yg baru
     orderRecentScreen: (context) => OrderRecentScreen(),
         serviceContainerScreen: (context) => ServiceContainerScreen(),
     signupPageOneScreen: (context) => SignupPageOneScreen(),
     homeContainerScreen: (context) => HomeContainerScreen(),
-    initialRoute: (context) => ServiceContainerScreen()
+    initialRoute: (context) => SplashScreen()
   };
 }

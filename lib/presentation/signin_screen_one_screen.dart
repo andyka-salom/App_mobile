@@ -169,11 +169,8 @@ class SigninScreenOneScreen extends StatelessWidget {
       );
 
       if (response.statusCode == 200) {
-  // Login successful, handle the response accordingly
-  print('Login successful');
-  // Contoh: Navigasi ke layar berikutnya
-  // Navigator.pushReplacementNamed(context, '/home');
-}
+      Navigator.pushReplacementNamed(context, '/home_page');
+    }
  else {
         // Login failed, show an error message
         ScaffoldMessenger.of(context).showSnackBar(

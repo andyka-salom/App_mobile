@@ -23,4 +23,12 @@ class CustomButtonStyles {
         shadowColor: appTheme.black900.withOpacity(0.04),
         elevation: 10,
       );
+        static ButtonStyle get outlineBlueTL30 => ElevatedButton.styleFrom(
+        backgroundColor: theme.colorScheme.primary,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30.h),
+        ),
+        shadowColor: appTheme.blue30087,
+        elevation: 3,
+      );
 }

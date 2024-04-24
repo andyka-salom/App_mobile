@@ -226,8 +226,7 @@ class SignupPageOneScreen extends StatelessWidget {
       if (response.statusCode == 200) {
         // Registration successful, handle the response accordingly
         print('Registration successful');
-        // For example, navigate to the next screen
-        // Navigator.pushReplacementNamed(context, '/home');
+        Navigator.pushReplacementNamed(context, '/signin_screen_one_screen');
       }else {
         // Registration failed, show an error message with API response
         final Map<String, dynamic> responseData = json.decode(response.body);

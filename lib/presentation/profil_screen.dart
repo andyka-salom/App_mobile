@@ -4,10 +4,7 @@ import '../../widgets/custom_bottom_bar.dart';
 import '../../widgets/custom_icon_button.dart'; // ignore_for_file: must_be_immutable
 
 class ProfilScreen extends StatelessWidget {
-  ProfilScreen({Key? key})
-      : super(
-          key: key,
-        );
+  ProfilScreen({Key? key}) : super(key: key);
 
   GlobalKey<NavigatorState> navigatorKey = GlobalKey();
 
@@ -61,10 +58,74 @@ class ProfilScreen extends StatelessWidget {
             ],
           ),
         ),
-        // bottomNavigationBar: _buildBottomBar(context),
+        bottomNavigationBar: _buildBottombar(context),
       ),
     );
   }
+
+Widget _buildBottombar(BuildContext context) {
+    return CustomBottomBar(
+      onChanged: (BottomBarEnum type) {
+        Navigator.pushNamed(
+            navigatorKey.currentContext!, getCurrentRoute(type));
+      },
+    );
+  }
+
+  ///Handling route based on bottom click actions
+  String getCurrentRoute(BottomBarEnum type) {
+    switch (type) {
+      case BottomBarEnum.Home:
+        return "/";
+      case BottomBarEnum.Service:
+        return "/";
+      case BottomBarEnum.Order:
+        return "/";
+      case BottomBarEnum.Profile:
+        return AppRoutes.Profile;
+      default:
+        return "/";
+    }
+  }
+
+  ///Handling page based on route
+  Widget getCurrentPage(String currentRoute) {
+    switch (currentRoute) {
+      case AppRoutes.Profile:
+        return ProfilScreen();
+      default:
+        return DefaultWidget(); // Here is where the error occurred
+    }
+  }
+}
+
+class DefaultWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Color(0xffffffff),
+      padding: EdgeInsets.all(10),
+      child: Center(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Please replace the respective Widget here',
+              style: TextStyle(
+                fontSize: 18,
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
+
+
 
   /// Section Widget
   Widget _buildColumnAvatar(BuildContext context) {
@@ -302,15 +363,9 @@ class ProfilScreen extends StatelessWidget {
     );
   }
 
-  /// Section Widget
-  // Widget _buildBottomBar(BuildContext context) {
-  //   return CustomBottomBar(
-  //     onChanged: (BottomBarEnum type) {},
-  //   );
-  // }
 
   /// Navigates back to the previous screen.
   onTapImgArrowleftone(BuildContext context) {
     Navigator.pop(context);
   }
-}
+

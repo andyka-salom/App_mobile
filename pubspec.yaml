@@ -14,6 +14,7 @@ dependencies:
   intl: ^0.18.0
   connectivity_plus: ^5.0.2
 dev_dependencies: 
+  flutter_launcher_icons: "^0.13.1"
   flutter_test: 
     sdk: flutter
 flutter: 
@@ -40,3 +41,20 @@ flutter:
       fonts:
         - asset: assets/fonts/RobotoRomanBold.ttf
           weight: 700
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/illustration.png"
+  min_sdk_android: 21 
+  web:
+    generate: true
+    image_path: "assets/images/illustration.png"
+    background_color: "#hexcode"
+    theme_color: "#hexcode"
+  windows:
+    generate: true
+    image_path: "assets/images/illustration.png"
+    icon_size: 48 # min:48, max:256, default: 48
+  macos:
+    generate: true
+    image_path: "assets/images/illustration.png"

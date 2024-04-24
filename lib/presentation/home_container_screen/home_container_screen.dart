@@ -61,7 +61,31 @@ class HomeContainerScreen extends StatelessWidget {
       case AppRoutes.homePage:
         return HomePage();
       default:
-        return DefaultWidget();
+        return DefaultWidget(); // Here is where the error occurred
     }
+  }
+}
+
+class DefaultWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Color(0xffffffff),
+      padding: EdgeInsets.all(10),
+      child: Center(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Please replace the respective Widget here',
+              style: TextStyle(
+                fontSize: 18,
+              ),
+            )
+          ],
+        ),
+      ),
+    );
   }
 }
