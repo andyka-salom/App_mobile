@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/app_export.dart';
-import '../routes/app_routes.dart';
+
 
 enum BottomBarEnum { Home, Service, Order, Profile }
 // ignore_for_file: must_be_immutable
@@ -81,20 +81,20 @@ class CustomBottomBarState extends State<CustomBottomBar> {
           });
 
           // Navigate to the corresponding page
-          switch (bottomMenuList[index].type) {
-            case BottomBarEnum.Home:
-              Navigator.pushNamed(context, AppRoutes.homePage);
-              break;
-            case BottomBarEnum.Service:
-              Navigator.pushNamed(context, AppRoutes.ServicePage);
-              break;
-            case BottomBarEnum.Order:
-              Navigator.pushNamed(context, AppRoutes.orderRecentScreen);
-              break;
-            case BottomBarEnum.Profile:
-              Navigator.pushNamed(context, AppRoutes.Profile);
-              break;
-          }
+          // switch (bottomMenuList[index].type) {
+          //   case BottomBarEnum.Home:
+          //     Navigator.pushNamed(context, AppRoutes.homePage);
+          //     break;
+          //   case BottomBarEnum.Service:
+          //     Navigator.pushNamed(context, AppRoutes.service_page);
+          //     break;
+          //   case BottomBarEnum.Order:
+          //     Navigator.pushNamed(context, AppRoutes.orderRecentScreen);
+          //     break;
+          //   case BottomBarEnum.Profile:
+          //     Navigator.pushNamed(context, AppRoutes.Profile);
+          //     break;
+          // }
         },
       ),
     );

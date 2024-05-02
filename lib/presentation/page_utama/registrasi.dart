@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import '../core/app_export.dart';
-import '../widgets/custom_checkbox_button.dart';
-import '../widgets/custom_elevated_button.dart';
-import '../widgets/custom_text_form_field.dart'; // ignore_for_file: must_be_immutable
+import '../../core/app_export.dart';
+import '../../widgets/custom_checkbox_button.dart';
+import '../../widgets/custom_elevated_button.dart';
+import '../../widgets/custom_text_form_field.dart'; // ignore_for_file: must_be_immutable
 
 class SignupPageOneScreen extends StatelessWidget {
   SignupPageOneScreen({Key? key}) : super(key: key);

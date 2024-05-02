@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../core/app_export.dart';
-import '../widgets/custom_elevated_button.dart';
+import '../../core/app_export.dart';
+import '../../widgets/custom_elevated_button.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({Key? key})

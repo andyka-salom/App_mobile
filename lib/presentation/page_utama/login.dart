@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import '../core/app_export.dart';
-import '../widgets/custom_checkbox_button.dart';
-import '../widgets/custom_elevated_button.dart';
-import '../widgets/custom_text_form_field.dart'; // ignore_for_file: must_be_immutable
+import '../../core/app_export.dart';
+import '../../widgets/custom_checkbox_button.dart';
+import '../../widgets/custom_elevated_button.dart';
+import '../../widgets/custom_text_form_field.dart'; // ignore_for_file: must_be_immutable
 class User {
   final int id;
   final String username;
@@ -198,10 +198,10 @@ void _submitLogin(BuildContext context) async {
       final responseData = json.decode(response.body);
       loggedInUser = User.fromJson(responseData); 
         print('User ID: ${loggedInUser!.id}');
-  print('Username: ${loggedInUser!.username}');
-  print('Email: ${loggedInUser!.email}');
-  print('Token: ${loggedInUser!.token}');
-  print('Photo URL: ${loggedInUser!.photoUrl}');// Menyimpan user yang masuk
+        print('Username: ${loggedInUser!.username}');
+        print('Email: ${loggedInUser!.email}');
+        print('Token: ${loggedInUser!.token}');
+        print('Photo URL: ${loggedInUser!.photoUrl}');// Menyimpan user yang masuk
       Navigator.pushReplacementNamed(context, '/home_page');
     } else {
             // Login failed, show an error message

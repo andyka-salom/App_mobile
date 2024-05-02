@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../core/app_export.dart';
-import '../../widgets/custom_bottom_bar.dart';
-import '../../widgets/custom_icon_button.dart'; // ignore_for_file: must_be_immutable
+import '../../../core/app_export.dart';
+import '../../../widgets/custom_bottom_bar.dart';
+import '../../../widgets/custom_icon_button.dart'; // ignore_for_file: must_be_immutable
 
 class ProfilScreen extends StatelessWidget {
   ProfilScreen({Key? key}) : super(key: key);
