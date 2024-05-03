@@ -53,8 +53,8 @@ class _ServicePageState extends State<ServicePage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white, // Ganti warna latar belakang appbar menjadi putih
-        elevation: 0, // Hilangkan bayangan pada appbar
+        backgroundColor: Colors.white,
+        elevation: 0,
         title: Row(
           children: [
             IconButton(
@@ -83,11 +83,11 @@ class _ServicePageState extends State<ServicePage>
                   } else {
                     return snapshot.hasData
                         ? Container(
-                            color: Colors.white, // Ganti warna latar belakang tab menjadi putih
-                            padding: EdgeInsets.only(top: 8), // Tambahkan padding atas pada tab
+                            color: Colors.white,
+                            padding: EdgeInsets.only(top: 8),
                             child: TabBar(
                               controller: _tabController,
-                              indicatorColor: Colors.black, // Ubah warna penanda tab menjadi hitam
+                              indicatorColor: Colors.black,
                               tabs: snapshot.data!
                                   .map((category) => Tab(text: category.name))
                                   .toList(),
@@ -123,16 +123,16 @@ class _ServicePageState extends State<ServicePage>
 
   Widget _buildSearchInput() {
     return Container(
-      margin: EdgeInsets.all(8), // Tambahkan margin pada input pencarian
+      margin: EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20), // Ubah bentuk input pencarian menjadi setengah lingkaran
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.5),
             spreadRadius: 1,
             blurRadius: 3,
-            offset: Offset(0, 2), // changes position of shadow
+            offset: Offset(0, 2),
           ),
         ],
       ),
@@ -140,9 +140,9 @@ class _ServicePageState extends State<ServicePage>
         decoration: InputDecoration(
           hintText: 'Search...',
           prefixIcon: Icon(Icons.search),
-          border: InputBorder.none, // Hilangkan garis input pencarian
+          border: InputBorder.none,
         ),
-        style: TextStyle(color: Colors.black), // Ubah warna teks input pencarian
+        style: TextStyle(color: Colors.black),
       ),
     );
   }
@@ -191,7 +191,7 @@ class _ServicePageState extends State<ServicePage>
                   child: ClipRRect(
                     borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
                     child: Image.network(
-                      product.user.photo,
+                      product.user.photoUrl, // Gunakan photoUrl dari user
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -200,7 +200,7 @@ class _ServicePageState extends State<ServicePage>
                   bottom: 8,
                   left: 8,
                   child: Text(
-                    product.name,
+                    product.name, // Tampilkan nama produk
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -220,7 +220,7 @@ class _ServicePageState extends State<ServicePage>
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Text(
-                    'Price: \$${product.price.toStringAsFixed(2)}',
+                    'Price: \$${product.price.toStringAsFixed(2)}', // Tampilkan harga produk
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.black87,
@@ -298,15 +298,15 @@ class Product {
 class User {
   final int id;
   final String username;
-  final String photo;
+  final String photoUrl; // Ubah menjadi photoUrl
 
-  User({required this.id, required this.username, required this.photo});
+  User({required this.id, required this.username, required this.photoUrl});
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       id: json['id'],
       username: json['username'],
-      photo: json['photo'],
+      photoUrl: json['photo_url'], // Sesuaikan dengan struktur JSON
     );
   }
 }

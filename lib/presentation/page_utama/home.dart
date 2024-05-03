@@ -206,55 +206,89 @@ class _HomePageState extends State {
     );
   }
 
- Widget _buildProductCard(dynamic product) {
+ Widget _buildProductCard(Map<String, dynamic> product) {
+  final Map<String, dynamic> user = product['user'];
+
   return Card(
     elevation: 3,
-    child: SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Menggunakan widget conditional untuk menentukan apakah foto tersedia atau tidak
-          product['image_url'] != null
-              ? Image.network(
-                  product['image_url'],
-                  fit: BoxFit.cover,
-                )
-              : Placeholder( // Gunakan placeholder jika foto tidak tersedia
-                  fallbackWidth: double.infinity,
-                  fallbackHeight: 80,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Expanded(
+          flex: 3,
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
+                  child: Image.network(
+                    user['photo_url'], // Use photoUrl from user
+                    fit: BoxFit.cover,
+                  ),
                 ),
-          Padding(
+              ),
+              Positioned(
+                bottom: 8,
+                left: 8,
+                child: Text(
+                  product['name'], // Display product name
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          flex: 2,
+          child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Text(
-                  product['name'] ?? '',
+                  'Price: \$${product['price'].toStringAsFixed(2)}', // Display product price
                   style: TextStyle(
                     fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
                   ),
                 ),
-                Text(
-                  'Price: ${product['price'] ?? ''}',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey,
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: SizedBox(
+                    width: 100,
+                    height: 30,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        // Action when order button is pressed
+                      },
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                        ),
+                      ),
+                      child: Text(
+                        'Order',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-                SizedBox(height: 8),
-                ElevatedButton(
-                  onPressed: () {
-                    // Tindakan ketika tombol ditekan
-                  },
-                  child: Text('Order'),
                 ),
               ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     ),
   );
 }
