@@ -1,34 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State {
-  late String _greeting = ''; // Inisialisasi _greeting dengan nilai default
-  String _userName = ''; // Inisialisasi _userName dengan nilai default
+class _HomePageState extends State<HomePage> {
+  late String _greeting = '';
+  String _userName = '';
+  String _userPhotoUrl = ''; // Variabel untuk menyimpan URL foto pengguna
 
-  late int _selectedTabIndex = 0; // Indeks tab yang dipilih
-  late List<dynamic> _categories = []; // List untuk menyimpan data kategori
-  late List<dynamic> _products = []; // List untuk menyimpan data produk
-  TextEditingController _searchController = TextEditingController(); // Controller untuk input pencarian
+  late int _selectedTabIndex = 0;
+  late List<dynamic> _categories = [];
+  late List<dynamic> _products = [];
+  TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _setGreeting(); // Set salam saat halaman dimuat
-    _fetchCategories(); // Ambil data kategori saat halaman dimuat
-    _setUserName(); // Set nama pengguna
-  }
-
-  void _setUserName() {
-    // Fungsi dummy untuk menetapkan nama pengguna
-    setState(() {
-      _userName = 'John Doe';
-    });
+    _setGreeting();
+    _fetchCategories();
+    _getUserData(); // Panggil fungsi untuk mengambil data pengguna dari SharedPreferences
   }
 
   void _setGreeting() {
@@ -49,7 +44,8 @@ class _HomePageState extends State {
   }
 
   Future<void> _fetchCategories() async {
-    final response = await http.get(Uri.parse('http://10.0.2.2:5000/product-categories'));
+    final response =
+        await http.get(Uri.parse('http://10.0.2.2:5000/product-categories'));
     if (response.statusCode == 200) {
       setState(() {
         _categories = json.decode(response.body);
@@ -60,7 +56,8 @@ class _HomePageState extends State {
   }
 
   Future<void> _fetchProducts(String categoryId) async {
-    final response = await http.get(Uri.parse('http://10.0.2.2:5000/products/category/$categoryId'));
+    final response = await http.get(
+        Uri.parse('http://10.0.2.2:5000/products/category/$categoryId'));
     if (response.statusCode == 200) {
       setState(() {
         _products = json.decode(response.body);
@@ -68,6 +65,16 @@ class _HomePageState extends State {
     } else {
       throw Exception('Failed to load products');
     }
+  }
+
+  // Fungsi untuk mengambil data pengguna dari SharedPreferences
+  Future<void> _getUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _userName = prefs.getString('username') ?? ''; // Mengambil username dari SharedPreferences
+      _userPhotoUrl =
+          prefs.getString('photoUrl') ?? ''; // Mengambil URL foto pengguna dari SharedPreferences
+    });
   }
 
   @override
@@ -97,7 +104,7 @@ class _HomePageState extends State {
                         ),
                         SizedBox(height: 8),
                         Text(
-                          'Hello, $_userName', // Menampilkan nama pengguna di sini
+                          'Hello, $_userName',
                           style: TextStyle(
                             fontSize: 18,
                             color: Colors.grey,
@@ -106,9 +113,8 @@ class _HomePageState extends State {
                       ],
                     ),
                     CircleAvatar(
-                      // Menampilkan foto pengguna
                       radius: 30,
-                      // backgroundImage: NetworkImage(_userPhotoUrl), // Ganti _userPhotoUrl dengan URL foto pengguna
+                      backgroundImage: NetworkImage(_userPhotoUrl), // Menggunakan URL foto pengguna
                     ),
                   ],
                 ),
@@ -206,91 +212,90 @@ class _HomePageState extends State {
     );
   }
 
- Widget _buildProductCard(Map<String, dynamic> product) {
-  final Map<String, dynamic> user = product['user'];
+  Widget _buildProductCard(Map<String, dynamic> product) {
+    final Map<String, dynamic> user = product['user'];
 
-  return Card(
-    elevation: 3,
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(
-          flex: 3,
-          child: Stack(
-            children: [
-              Positioned.fill(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
-                  child: Image.network(
-                    user['photo_url'], // Use photoUrl from user
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: 8,
-                left: 8,
-                child: Text(
-                  product['name'], // Display product name
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        Expanded(
-          flex: 2,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+    return Card(
+      elevation: 3,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            flex: 3,
+            child: Stack(
               children: [
-                Text(
-                  'Price: \$${product['price'].toStringAsFixed(2)}', // Display product price
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.black87,
+                Positioned.fill(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
+                    child: Image.network(
+                      user['photo_url'], // Gunakan photoUrl dari data produk
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: SizedBox(
-                    width: 100,
-                    height: 30,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        // Action when order button is pressed
-                      },
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
-                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20.0),
-                          ),
-                        ),
-                      ),
-                      child: Text(
-                        'Order',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.white,
-                        ),
-                      ),
+                Positioned(
+                  bottom: 8,
+                  left: 8,
+                  child: Text(
+                    product['name'], // Tampilkan nama produk
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
                   ),
                 ),
               ],
             ),
           ),
-        ),
-      ],
-    ),
-  );
-}
-
+          Expanded(
+            flex: 2,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Text(
+                    'Price: \$${product['price'].toStringAsFixed(2)}', // Tampilkan harga produk
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: SizedBox(
+                      width: 100,
+                      height: 30,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          // Aksi ketika tombol pesan ditekan
+                        },
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+                          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20.0),
+                            ),
+                          ),
+                        ),
+                        child: Text(
+                          'Order',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

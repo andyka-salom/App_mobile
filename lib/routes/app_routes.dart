@@ -47,6 +47,6 @@ class AppRoutes {
     '/servicecategory': (context) => ServiceCategoryScreen(),
     '/detail_order': (context) => DetailOrderScreen(), 
     
-    initialRoute: (context) => HomePage()
+    initialRoute: (context) => SplashScreen()
   };
 }

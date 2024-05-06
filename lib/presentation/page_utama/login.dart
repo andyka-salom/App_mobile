@@ -1,16 +1,22 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/app_export.dart';
 import '../../widgets/custom_checkbox_button.dart';
 import '../../widgets/custom_elevated_button.dart';
-import '../../widgets/custom_text_form_field.dart'; // ignore_for_file: must_be_immutable
+import '../../widgets/custom_text_form_field.dart';
+
 class User {
   final int id;
   final String username;
   final String email;
   final String token;
   final String photoUrl;
+  final String? mobile;
+  final String? postalCode;
+  final String? city;
+  final String? address;
 
   User({
     required this.id,
@@ -18,6 +24,10 @@ class User {
     required this.email,
     required this.token,
     required this.photoUrl,
+    this.mobile,
+    this.postalCode,
+    this.city,
+    this.address,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -27,10 +37,14 @@ class User {
       email: json['user']['email'],
       token: json['token'],
       photoUrl: json['user']['photo_url'],
+      mobile: json['user']['mobile'],
+      postalCode: json['user']['postal_code'],
+      city: json['user']['city'],
+      address: json['user']['address'],
     );
   }
 }
-
+// ignore_for_file: must_be_immutable
 class SigninScreenOneScreen extends StatelessWidget {
   SigninScreenOneScreen({Key? key}) : super(key: key);
 
@@ -102,7 +116,6 @@ class SigninScreenOneScreen extends StatelessWidget {
     );
   }
 
-  /// Section Widget
   Widget _buildSigninForm(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(
@@ -176,42 +189,98 @@ class SigninScreenOneScreen extends StatelessWidget {
     );
   }
 
-  /// Navigates to the signupPageOneScreen when the action is triggered.
   onTapTxtDonthaveanaccount(BuildContext context) {
     Navigator.pushNamed(context, AppRoutes.signupPageOneScreen);
   }
 
-User? loggedInUser; // Deklarasi variabel global
+  Future<void> _submitLogin(BuildContext context) async {
+    if (_formKey.currentState!.validate()) {
+      final email = emailController.text.trim();
+      final password = passwordController.text.trim();
 
-void _submitLogin(BuildContext context) async {
-  if (_formKey.currentState!.validate()) {
-    final email = emailController.text.trim();
-    final password = passwordController.text.trim();
+      final response = await http.post(
+        Uri.parse('http://10.0.2.2:5000/login'),
+        body: json.encode({'email': email, 'password': password}),
+        headers: {'Content-Type': 'application/json'},
+      );
 
-    final response = await http.post(
-      Uri.parse('http://10.0.2.2:5000/login'),
-      body: json.encode({'email': email, 'password': password}),
-      headers: {'Content-Type': 'application/json'},
-    );
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        final loggedInUser = User.fromJson(responseData);
 
-    if (response.statusCode == 200) {
-      final responseData = json.decode(response.body);
-      loggedInUser = User.fromJson(responseData); 
-        print('User ID: ${loggedInUser!.id}');
-        print('Username: ${loggedInUser!.username}');
-        print('Email: ${loggedInUser!.email}');
-        print('Token: ${loggedInUser!.token}');
-        print('Photo URL: ${loggedInUser!.photoUrl}');// Menyimpan user yang masuk
-      Navigator.pushReplacementNamed(context, '/home_page');
-    } else {
-            // Login failed, show an error message
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Login failed. Please check your credentials.'),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
+        await _saveUserDataToPrefs(loggedInUser);
+
+        final userFromPrefs = await getUserFromPrefs();
+        if (userFromPrefs != null) {
+          print('ID: ${userFromPrefs.id}');
+          print('Username: ${userFromPrefs.username}');
+          print('Email: ${userFromPrefs.email}');
+          print('Token: ${userFromPrefs.token}');
+          print('Photo URL: ${userFromPrefs.photoUrl}');
+          print('Mobile: ${userFromPrefs.mobile ?? "Not Provided"}');
+          print('Postal Code: ${userFromPrefs.postalCode ?? "Not Provided"}');
+          print('City: ${userFromPrefs.city ?? "Not Provided"}');
+          print('Address: ${userFromPrefs.address ?? "Not Provided"}');
         }
+
+        Navigator.pushReplacementNamed(context, '/home');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Login gagal. Periksa kredensial Anda.'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
+  }
+
+  Future<void> _saveUserDataToPrefs(User user) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      prefs.setInt('id', user.id);
+      prefs.setString('username', user.username);
+      prefs.setString('email', user.email);
+      prefs.setString('token', user.token);
+      prefs.setString('photoUrl', user.photoUrl);
+      prefs.setString('mobile', user.mobile ?? '');
+      prefs.setString('postalCode', user.postalCode ?? '');
+      prefs.setString('city', user.city ?? '');
+      prefs.setString('address', user.address ?? '');
+    } catch (e) {
+    }
+  }
+
+  static Future<User?> getUserFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    final id = prefs.getInt('id');
+    final username = prefs.getString('username');
+    final email = prefs.getString('email');
+    final token = prefs.getString('token');
+    final photoUrl = prefs.getString('photoUrl');
+    final mobile = prefs.getString('mobile');
+    final postalCode = prefs.getString('postalCode');
+    final city = prefs.getString('city');
+    final address = prefs.getString('address');
+
+    if (id != null &&
+        username != null &&
+        email != null &&
+        token != null &&
+        photoUrl != null) {
+      return User(
+        id: id,
+        username: username,
+        email: email,
+        token: token,
+        photoUrl: photoUrl,
+        mobile: mobile,
+        postalCode: postalCode,
+        city: city,
+        address: address,
+      );
+    } else {
+      return null;
+    }
+  }
+}
