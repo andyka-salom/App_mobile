@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import '../page_utama/home.dart';
+import '../page_utama/profile.dart';
+import '../page_utama/history.dart';
 
 class ServicePage extends StatefulWidget {
   @override
@@ -57,12 +60,6 @@ class _ServicePageState extends State<ServicePage>
         elevation: 0,
         title: Row(
           children: [
-            IconButton(
-              icon: Icon(Icons.arrow_back),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
             Expanded(
               child: Text("Service"),
             ),
@@ -87,7 +84,7 @@ class _ServicePageState extends State<ServicePage>
                             padding: EdgeInsets.only(top: 8),
                             child: TabBar(
                               controller: _tabController,
-                              indicatorColor: Colors.black,
+                              indicatorColor: Colors.blue,
                               tabs: snapshot.data!
                                   .map((category) => Tab(text: category.name))
                                   .toList(),
@@ -115,6 +112,45 @@ class _ServicePageState extends State<ServicePage>
                 return _buildProductList(category.id);
               }).toList(),
             );
+          }
+        },
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 1, // Index 1 mengarah ke halaman service
+        selectedItemColor: Colors.blue, // Warna aktif biru
+        unselectedItemColor: Colors.grey, // Warna tidak aktif abu-abu
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.local_offer),
+            label: 'Service',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.history),
+            label: 'Order History',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+        ],
+        onTap: (index) {
+          switch (index) {
+            case 0:
+              Navigator.pushNamed(context, '/home');
+              break;
+            case 1:
+              Navigator.pushNamed(context, '/service_page');
+              break;
+            case 2:
+              Navigator.pushNamed(context, '/order_recent_screen');
+              break;
+            case 3:
+              Navigator.pushNamed(context, '/profile');
+              break;
           }
         },
       ),
@@ -313,6 +349,12 @@ class User {
 
 void main() {
   runApp(MaterialApp(
-    home: ServicePage(),
+    initialRoute: '/service_page', // Set halaman awal ke halaman service
+    routes: {
+      '/service_page': (context) => ServicePage(),
+      '/profile': (context) => ProfileScreen(),
+      '/order_recent_screen': (context) => OrderRecentScreen(),
+      '/home': (context) => HomePage(),
+    },
   ));
 }

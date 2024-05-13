@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../core/app_export.dart';
-import '../../../widgets/app_bar/appbar_leading_image.dart';
-import '../../../widgets/app_bar/appbar_title.dart';
-import '../../../widgets/app_bar/custom_app_bar.dart';
+// import '../../../widgets/app_bar/appbar_leading_image.dart';
+// import '../../../widgets/app_bar/appbar_title.dart';
+// import '../../../widgets/app_bar/custom_app_bar.dart';
 import '../../../widgets/custom_elevated_button.dart';
 
 class OrderRecentScreen extends StatelessWidget {
@@ -25,23 +25,62 @@ class OrderRecentScreen extends StatelessWidget {
             ],
           ),
         ),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: 2, // Indeks untuk OrderRecentScreen
+          selectedItemColor: Colors.blue, // Warna biru untuk item yang dipilih
+          unselectedItemColor: Colors.grey, // Warna abu-abu untuk item yang tidak dipilih
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.local_offer),
+              label: 'Service',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.history),
+              label: 'Order History',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Profile',
+            ),
+          ],
+          onTap: (index) {
+            switch (index) {
+              case 0:
+                Navigator.pushNamed(context, '/home');
+                break;
+              case 1:
+                Navigator.pushNamed(context, '/service_page');
+                break;
+              case 2:
+                Navigator.pushNamed(context, '/order_recent_screen');
+                break;
+              case 3:
+                Navigator.pushNamed(context, '/profile');
+                break;
+            }
+          },
+        ),
       ),
     );
   }
 
   PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return CustomAppBar(
-      leadingWidth: 44.h,
-      leading: AppbarLeadingImage(
-        imagePath: ImageConstant.imgArrowLeft,
-        margin: EdgeInsets.only(left: 16.h, top: 15.v, bottom: 12.v),
-        onTap: () {
-          onTapArrowLeft(context);
-        },
-      ),
-      title: AppbarTitle(
-        text: "Order Recent",
-        margin: EdgeInsets.only(left: 16.h),
+    return AppBar(
+      title: Text('Order History'),
+      leading: GestureDetector(
+        onTap: () => Navigator.pop(context),
+        child: Padding(
+          padding: EdgeInsets.all(8.0),
+          child: CustomImageView(
+            imagePath: ImageConstant.imgArrowLeftBlack90032x32,
+            height: 32.adaptSize,
+            width: 32.adaptSize,
+          ),
+        ),
       ),
     );
   }
@@ -113,32 +152,32 @@ class OrderRecentScreen extends StatelessWidget {
       backgroundColor: Colors.grey, // Default color if image is not available
     );
   }
-Widget _buildActionButtons(BuildContext context) {
-  return Row(
-    mainAxisAlignment: MainAxisAlignment.end,
-    children: [
-      _buildButton(context, "Done", () {
-        // Add logic for "Done" button here
-      }),
-      SizedBox(width: 9.h),
-      _buildButton(context, "Detail", () {
-        // Add logic for "Detail" button here
-      }),
-    ],
-  );
-}
 
-Widget _buildButton(BuildContext context, String text, VoidCallback onPressed) {
-  return CustomElevatedButton(
-    width: 92.h,
-    text: text,
-    buttonTextStyle: theme.textTheme.titleMedium!.copyWith(
-      color: Colors.white, // Change text color to white
-    ),
-    onPressed: onPressed,
-  );
-}
+  Widget _buildActionButtons(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        _buildButton(context, "Done", () {
+          // Add logic for "Done" button here
+        }),
+        SizedBox(width: 9.h),
+        _buildButton(context, "Detail", () {
+          // Add logic for "Detail" button here
+        }),
+      ],
+    );
+  }
 
+  Widget _buildButton(BuildContext context, String text, VoidCallback onPressed) {
+    return CustomElevatedButton(
+      width: 92.h,
+      text: text,
+      buttonTextStyle: theme.textTheme.titleMedium!.copyWith(
+        color: Colors.white, // Change text color to white
+      ),
+      onPressed: onPressed,
+    );
+  }
 
   // Method for navigating back
   void onTapArrowLeft(BuildContext context) {

@@ -4,6 +4,14 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
+  static const String splashScreen = '/splash_screen';
+  static const String signinScreenOneScreen = '/signin_screen_one_screen';
+  static const String signupPageOneScreen = '/signup_page_one_screen';
+  static const String service_page = '/service_page';
+  static const String Profile = '/profil';
+  static const String orderRecentScreen = '/order_recent_screen';
+  static const String homepage = "/home";
+
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -11,9 +19,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late String _greeting = '';
   String _userName = '';
-  String _userPhotoUrl = ''; // Variabel untuk menyimpan URL foto pengguna
-
-  late int _selectedTabIndex = 0;
+  String _userPhotoUrl = '';
+  late int _selectedTabIndex = 0; // Represent the index of bottom navigation tab
   late List<dynamic> _categories = [];
   late List<dynamic> _products = [];
   TextEditingController _searchController = TextEditingController();
@@ -23,7 +30,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _setGreeting();
     _fetchCategories();
-    _getUserData(); // Panggil fungsi untuk mengambil data pengguna dari SharedPreferences
+    _getUserData();
   }
 
   void _setGreeting() {
@@ -50,6 +57,8 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         _categories = json.decode(response.body);
       });
+      // Fetch products for the first category
+      _fetchProducts(_categories[0]['id'].toString());
     } else {
       throw Exception('Failed to load categories');
     }
@@ -67,13 +76,11 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  // Fungsi untuk mengambil data pengguna dari SharedPreferences
   Future<void> _getUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      _userName = prefs.getString('username') ?? ''; // Mengambil username dari SharedPreferences
-      _userPhotoUrl =
-          prefs.getString('photoUrl') ?? ''; // Mengambil URL foto pengguna dari SharedPreferences
+      _userName = prefs.getString('username') ?? '';
+      _userPhotoUrl = prefs.getString('photoUrl') ?? '';
     });
   }
 
@@ -81,7 +88,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.grey[100], // Changed background color
         body: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -114,7 +121,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     CircleAvatar(
                       radius: 30,
-                      backgroundImage: NetworkImage(_userPhotoUrl), // Menggunakan URL foto pengguna
+                      backgroundImage: NetworkImage(_userPhotoUrl),
                     ),
                   ],
                 ),
@@ -124,6 +131,7 @@ class _HomePageState extends State<HomePage> {
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: Container(
                   decoration: BoxDecoration(
+                    color: Colors.white, // Changed container color
                     borderRadius: BorderRadius.circular(20.0),
                     border: Border.all(color: Colors.grey),
                   ),
@@ -158,8 +166,59 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _selectedTabIndex,
+          onTap: (index) {
+            // Only navigate if the selected tab is not already active
+            if (index != _selectedTabIndex) {
+              setState(() {
+                _selectedTabIndex = index;
+              });
+              _navigateToPage(index);
+            }
+          },
+          backgroundColor: Colors.blue[300], // Changed navigation bar background color
+          selectedItemColor: Colors.blue, // Changed selected item color
+          unselectedItemColor: Colors.grey[300], // Changed unselected item color
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.local_offer),
+              label: 'Service',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.history),
+              label: 'Order History',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Profile',
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  void _navigateToPage(int index) {
+    switch (index) {
+      case 0:
+        // Fetch products for the first category when returning to Home page
+        _fetchProducts(_categories[0]['id'].toString());
+        break;
+      case 1:
+        Navigator.pushNamed(context, HomePage.service_page);
+        break;
+      case 2:
+        Navigator.pushNamed(context, HomePage.orderRecentScreen);
+        break;
+      case 3:
+        Navigator.pushNamed(context, HomePage.Profile);
+        break;
+    }
   }
 
   Widget _buildTabs() {
@@ -178,18 +237,19 @@ class _HomePageState extends State<HomePage> {
     return GestureDetector(
       onTap: () {
         setState(() {
-          _selectedTabIndex = index;
-          _fetchProducts(id.toString());
+          // Set the selected tab index to the bottom navigation tab index
+          _selectedTabIndex = 0;
         });
+        _fetchProducts(id.toString());
       },
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        color: _selectedTabIndex == index ? Colors.grey[200] : null,
+        color: _selectedTabIndex == 0 ? Colors.blue : null, // Changed tab item color
         child: Text(
           title,
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: _selectedTabIndex == index ? Colors.black : Colors.grey,
+            color: _selectedTabIndex == 0 ? Colors.white : Colors.grey,
           ),
         ),
       ),
@@ -197,19 +257,25 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildTabContent() {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 10.0,
-        mainAxisSpacing: 10.0,
-      ),
-      itemCount: _products.length,
-      itemBuilder: (context, index) {
-        return _buildProductCard(_products[index]);
-      },
-    );
+    if (_products.isEmpty) {
+      return Center(
+        child: Text('Tidak ada produk pada kategori ini'),
+      );
+    } else {
+      return GridView.builder(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 10.0,
+          mainAxisSpacing: 10.0,
+        ),
+        itemCount: _products.length,
+        itemBuilder: (context, index) {
+          return _buildProductCard(_products[index]);
+        },
+      );
+    }
   }
 
   Widget _buildProductCard(Map<String, dynamic> product) {
@@ -228,7 +294,7 @@ class _HomePageState extends State<HomePage> {
                   child: ClipRRect(
                     borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
                     child: Image.network(
-                      user['photo_url'], // Gunakan photoUrl dari data produk
+                      user['photo_url'],
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -237,7 +303,7 @@ class _HomePageState extends State<HomePage> {
                   bottom: 8,
                   left: 8,
                   child: Text(
-                    product['name'], // Tampilkan nama produk
+                    product['name'],
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -257,7 +323,7 @@ class _HomePageState extends State<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Text(
-                    'Price: \$${product['price'].toStringAsFixed(2)}', // Tampilkan harga produk
+                    'Price: \$${product['price'].toStringAsFixed(2)}',
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.black87,
@@ -270,7 +336,7 @@ class _HomePageState extends State<HomePage> {
                       height: 30,
                       child: ElevatedButton(
                         onPressed: () {
-                          // Aksi ketika tombol pesan ditekan
+                          // Action when order button is pressed
                         },
                         style: ButtonStyle(
                           backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),

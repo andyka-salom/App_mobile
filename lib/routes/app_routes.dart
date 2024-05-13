@@ -2,16 +2,15 @@ import 'package:flutter/material.dart';
 import '../presentation/page_utama/login.dart';
 import '../presentation/page_utama/registrasi.dart';
 import '../presentation/personal_info_page_screen.dart';
-import '../presentation/page_utama/profile.dart';
 import '../presentation/serviceadd.dart';
 import '../presentation/service_category.dart';
 import '../presentation/detail_order_screen.dart';
-import '../presentation/page_utama/history.dart';
+import '../presentation/page_utama/history.dart' as HistoryPage;
 import '../presentation/order_screen.dart';
 import '../presentation/page_utama/splash_screen.dart'; 
 import '../presentation/page_utama/service.dart';
 import '../presentation/page_utama/home.dart';
-
+import '../presentation/page_utama/profile.dart'; // Import ProfilScreen
 
 class AppRoutes {
 
@@ -20,7 +19,7 @@ class AppRoutes {
   static const String signinScreenOneScreen = '/signin_screen_one_screen'; // Halaman login
   static const String signupPageOneScreen = '/signup_page_one_screen'; // Halaman register
   static const String service_page = '/service_page'; // Halaman service
-  static const String Profile = '/profil'; // Halaman Profil
+  static const String profile = '/profil'; // Halaman Profil
   static const String orderRecentScreen = '/order_recent_screen'; // Halaman History
   static const String homepage = "/home"; // Halaman home
   // End Page Utama
@@ -34,8 +33,8 @@ class AppRoutes {
     // Halaman utama
     splashScreen: (context) => SplashScreen(),
     signinScreenOneScreen: (context) => SigninScreenOneScreen(),
-    Profile: (context) => ProfilScreen(), 
-    orderRecentScreen: (context) => OrderRecentScreen(),
+    profile: (context) => ProfileScreen(), // Mengubah ProfilScreen menjadi ProfileScreen
+    orderRecentScreen: (context) => HistoryPage.OrderRecentScreen(),
     signupPageOneScreen: (context) => SignupPageOneScreen(),
     service_page: (context) => ServicePage(),
     homepage: (context) => HomePage(),
