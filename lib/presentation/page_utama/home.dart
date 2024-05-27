@@ -4,13 +4,9 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
-  static const String splashScreen = '/splash_screen';
-  static const String signinScreenOneScreen = '/signin_screen_one_screen';
-  static const String signupPageOneScreen = '/signup_page_one_screen';
-  static const String service_page = '/service_page';
-  static const String Profile = '/profil';
+  static const String servicePage = '/service_page';
+  static const String profile = '/profile';
   static const String orderRecentScreen = '/order_recent_screen';
-  static const String homepage = "/home";
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -20,7 +16,7 @@ class _HomePageState extends State<HomePage> {
   late String _greeting = '';
   String _userName = '';
   String _userPhotoUrl = '';
-  late int _selectedTabIndex = 0; // Represent the index of bottom navigation tab
+  late int _selectedTabIndex = 0;
   late List<dynamic> _categories = [];
   late List<dynamic> _products = [];
   TextEditingController _searchController = TextEditingController();
@@ -35,29 +31,23 @@ class _HomePageState extends State<HomePage> {
 
   void _setGreeting() {
     var hour = DateTime.now().hour;
-    if (hour < 12) {
-      setState(() {
+    setState(() {
+      if (hour < 12) {
         _greeting = 'Good Morning';
-      });
-    } else if (hour < 17) {
-      setState(() {
+      } else if (hour < 17) {
         _greeting = 'Good Afternoon';
-      });
-    } else {
-      setState(() {
+      } else {
         _greeting = 'Good Evening';
-      });
-    }
+      }
+    });
   }
 
   Future<void> _fetchCategories() async {
-    final response =
-        await http.get(Uri.parse('http://10.0.2.2:5000/product-categories'));
+    final response = await http.get(Uri.parse('http://10.0.2.2:5000/product-categories'));
     if (response.statusCode == 200) {
       setState(() {
         _categories = json.decode(response.body);
       });
-      // Fetch products for the first category
       _fetchProducts(_categories[0]['id'].toString());
     } else {
       throw Exception('Failed to load categories');
@@ -65,8 +55,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _fetchProducts(String categoryId) async {
-    final response = await http.get(
-        Uri.parse('http://10.0.2.2:5000/products/category/$categoryId'));
+    final response = await http.get(Uri.parse('http://10.0.2.2:5000/products/category/$categoryId'));
     if (response.statusCode == 200) {
       setState(() {
         _products = json.decode(response.body);
@@ -88,7 +77,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.grey[100], // Changed background color
+        backgroundColor: Colors.grey[100],
         body: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -114,7 +103,7 @@ class _HomePageState extends State<HomePage> {
                           'Hello, $_userName',
                           style: TextStyle(
                             fontSize: 18,
-                            color: Colors.grey,
+                            color: Colors.grey[700],
                           ),
                         ),
                       ],
@@ -131,9 +120,16 @@ class _HomePageState extends State<HomePage> {
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.white, // Changed container color
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(20.0),
-                    border: Border.all(color: Colors.grey),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        spreadRadius: 3,
+                        blurRadius: 5,
+                        offset: Offset(0, 3),
+                      ),
+                    ],
                   ),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -166,59 +162,9 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _selectedTabIndex,
-          onTap: (index) {
-            // Only navigate if the selected tab is not already active
-            if (index != _selectedTabIndex) {
-              setState(() {
-                _selectedTabIndex = index;
-              });
-              _navigateToPage(index);
-            }
-          },
-          backgroundColor: Colors.blue[300], // Changed navigation bar background color
-          selectedItemColor: Colors.blue, // Changed selected item color
-          unselectedItemColor: Colors.grey[300], // Changed unselected item color
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.local_offer),
-              label: 'Service',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.history),
-              label: 'Order History',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: 'Profile',
-            ),
-          ],
-        ),
+        
       ),
     );
-  }
-
-  void _navigateToPage(int index) {
-    switch (index) {
-      case 0:
-        // Fetch products for the first category when returning to Home page
-        _fetchProducts(_categories[0]['id'].toString());
-        break;
-      case 1:
-        Navigator.pushNamed(context, HomePage.service_page);
-        break;
-      case 2:
-        Navigator.pushNamed(context, HomePage.orderRecentScreen);
-        break;
-      case 3:
-        Navigator.pushNamed(context, HomePage.Profile);
-        break;
-    }
   }
 
   Widget _buildTabs() {
@@ -237,14 +183,20 @@ class _HomePageState extends State<HomePage> {
     return GestureDetector(
       onTap: () {
         setState(() {
-          // Set the selected tab index to the bottom navigation tab index
           _selectedTabIndex = 0;
         });
         _fetchProducts(id.toString());
       },
       child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 8.0),
         padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        color: _selectedTabIndex == 0 ? Colors.blue : null, // Changed tab item color
+        decoration: BoxDecoration(
+          color: _selectedTabIndex == 0 ? Colors.blue : Colors.transparent,
+          borderRadius: BorderRadius.circular(20.0),
+          border: _selectedTabIndex == 0
+              ? null
+              : Border.all(color: Colors.grey),
+        ),
         child: Text(
           title,
           style: TextStyle(
@@ -259,7 +211,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildTabContent() {
     if (_products.isEmpty) {
       return Center(
-        child: Text('Tidak ada produk pada kategori ini'),
+        child: Text('No products available in this category'),
       );
     } else {
       return GridView.builder(
@@ -283,6 +235,9 @@ class _HomePageState extends State<HomePage> {
 
     return Card(
       elevation: 3,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15.0),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -292,7 +247,7 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Positioned.fill(
                   child: ClipRRect(
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
                     child: Image.network(
                       user['photo_url'],
                       fit: BoxFit.cover,
@@ -302,12 +257,19 @@ class _HomePageState extends State<HomePage> {
                 Positioned(
                   bottom: 8,
                   left: 8,
-                  child: Text(
-                    product['name'],
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                    decoration: BoxDecoration(
+                      color: Colors.black54,
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: Text(
+                      product['name'],
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),

@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 import '../../core/app_export.dart';
 import '../../theme/custom_button_style.dart';
 import '../../widgets/app_bar/appbar_leading_image.dart';
@@ -6,33 +10,154 @@ import '../../widgets/app_bar/appbar_title.dart';
 import '../../widgets/app_bar/custom_app_bar.dart';
 import '../../widgets/custom_elevated_button.dart';
 import '../../widgets/custom_icon_button.dart';
-import '../../widgets/custom_text_form_field.dart'; // ignore_for_file: must_be_immutable
+import '../../widgets/custom_text_form_field.dart';
 
-class PersonalInfoPageScreen extends StatelessWidget {
-  PersonalInfoPageScreen({Key? key})
-      : super(
-          key: key,
-        );
+class User {
+  final int id;
+  final String username;
+  final String email;
+  final String token;
+  final String photoUrl;
+  final String? mobile;
+  final String? postalCode;
+  final String? city;
+  final String? address;
 
+  User({
+    required this.id,
+    required this.username,
+    required this.email,
+    required this.token,
+    required this.photoUrl,
+    this.mobile,
+    this.postalCode,
+    this.city,
+    this.address,
+  });
+}
+
+class PersonalInfoPageScreen extends StatefulWidget {
+  PersonalInfoPageScreen({Key? key}) : super(key: key);
+
+  @override
+  _PersonalInfoPageScreenState createState() => _PersonalInfoPageScreenState();
+}
+
+class _PersonalInfoPageScreenState extends State<PersonalInfoPageScreen> {
   TextEditingController userSixController = TextEditingController();
-
   TextEditingController emailController = TextEditingController();
-
   TextEditingController mobileNumberController = TextEditingController();
-
   TextEditingController pincodeController = TextEditingController();
-
   TextEditingController inputBoxOneController = TextEditingController();
-
   TextEditingController nameController = TextEditingController();
-
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  SharedPreferences? _prefs;
+  String? profilePhotoUrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  _loadData() async {
+    _prefs = await SharedPreferences.getInstance();
+    setState(() {
+      userSixController.text = _prefs?.getString('username') ?? '';
+      emailController.text = _prefs?.getString('email') ?? '';
+      mobileNumberController.text = _prefs?.getString('mobile') ?? '';
+      pincodeController.text = _prefs?.getString('postalCode') ?? '';
+      inputBoxOneController.text = _prefs?.getString('city') ?? '';
+      nameController.text = _prefs?.getString('address') ?? '';
+      profilePhotoUrl = _prefs?.getString('photoUrl');
+    });
+  }
+
+  Future<void> _saveUserDataToPrefs(User user) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      prefs.setInt('id', user.id);
+      prefs.setString('username', user.username);
+      prefs.setString('email', user.email);
+      prefs.setString('token', user.token);
+      prefs.setString('photoUrl', user.photoUrl);
+      prefs.setString('mobile', user.mobile ?? '');
+      prefs.setString('postalCode', user.postalCode ?? '');
+      prefs.setString('city', user.city ?? '');
+      prefs.setString('address', user.address ?? '');
+    } catch (e) {
+      print('Error saving user data to SharedPreferences: $e');
+    }
+  }
+
+  _saveData() async {
+    await _prefs?.setString('username', userSixController.text);
+    await _prefs?.setString('email', emailController.text);
+    await _prefs?.setString('mobile', mobileNumberController.text);
+    await _prefs?.setString('postalCode', pincodeController.text);
+    await _prefs?.setString('city', inputBoxOneController.text);
+    await _prefs?.setString('address', nameController.text);
+  }
+
+  _submitData() async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Save Changes"),
+          content: Text("Do you want to save the changes?"),
+          actions: <Widget>[
+            TextButton(
+              child: Text("No"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text("Yes"),
+              onPressed: () async {
+                await _saveData();
+                _sendDataToApi();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  _sendDataToApi() async {
+    final userId = _prefs?.getString('userId') ?? '';
+    final apiUrl = 'http://localhost:5000/users/$userId';
+    final data = {
+      'username': userSixController.text,
+      'email': emailController.text,
+      'mobileNumber': mobileNumberController.text,
+      'pincode': pincodeController.text,
+      'inputBoxOne': inputBoxOneController.text,
+      'name': nameController.text,
+    };
+
+    final response = await http.put(
+      Uri.parse(apiUrl),
+      body: jsonEncode(data),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      print('Data successfully saved on the server.');
+    } else {
+      print('Failed to save data on the server.');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: appTheme.whiteA700, 
+        backgroundColor: appTheme.whiteA700,
         resizeToAvoidBottomInset: false,
         appBar: _buildAppBar(context),
         body: Form(
@@ -64,12 +189,10 @@ class PersonalInfoPageScreen extends StatelessWidget {
                         alignment: Alignment.bottomRight,
                         children: [
                           CustomImageView(
-                            imagePath: ImageConstant.imgAvatar,
+                            imagePath: profilePhotoUrl ?? ImageConstant.imgAvatar,
                             height: 132.adaptSize,
                             width: 132.adaptSize,
-                            radius: BorderRadius.circular(
-                              66.h,
-                            ),
+                            radius: BorderRadius.circular(66.h),
                             alignment: Alignment.center,
                           ),
                           CustomIconButton(
@@ -87,14 +210,11 @@ class PersonalInfoPageScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 15.v),
                   Text(
-                    "Mark Davin",
+                    userSixController.text,
                     style: CustomTextStyles.headlineSmallBold,
                   ),
                   SizedBox(height: 15.v),
-                  Text(
-                    "UI / UX Designer at Google Inc.",
-                    style: theme.textTheme.bodyLarge,
-                  ),
+
                   SizedBox(height: 26.v),
                   Divider(
                     color: appTheme.gray50001,
@@ -124,24 +244,6 @@ class PersonalInfoPageScreen extends StatelessWidget {
                   SizedBox(height: 16.v),
                   _buildMobileNumber(context),
                   SizedBox(height: 16.v),
-                  _buildInputBox(context),
-                  SizedBox(height: 39.v),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Padding(
-                      padding: EdgeInsets.only(left: 32.h),
-                      child: Text(
-                        "Address",
-                        style: theme.textTheme.headlineSmall,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 18.v),
-                  Divider(
-                    indent: 32.h,
-                    endIndent: 32.h,
-                  ),
-                  SizedBox(height: 25.v),
                   _buildPincode(context),
                   SizedBox(height: 24.v),
                   _buildInputBoxOne(context),
@@ -163,7 +265,6 @@ class PersonalInfoPageScreen extends StatelessWidget {
     );
   }
 
-  /// Section Widget
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     return CustomAppBar(
       height: 107.v,
@@ -186,7 +287,6 @@ class PersonalInfoPageScreen extends StatelessWidget {
     );
   }
 
-  /// Section Widget
   Widget _buildUserSix(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 32.h),
@@ -209,7 +309,6 @@ class PersonalInfoPageScreen extends StatelessWidget {
     );
   }
 
-  /// Section Widget
   Widget _buildEmail(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 32.h),
@@ -232,7 +331,6 @@ class PersonalInfoPageScreen extends StatelessWidget {
     );
   }
 
-  /// Section Widget
   Widget _buildMobileNumber(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 32.h),
@@ -255,38 +353,6 @@ class PersonalInfoPageScreen extends StatelessWidget {
     );
   }
 
-  /// Section Widget
-  Widget _buildInputBox(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 32.h),
-      padding: EdgeInsets.fromLTRB(30.h, 21.v, 30.h, 19.v),
-      decoration: AppDecoration.outlineGray200,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          CustomImageView(
-            imagePath: ImageConstant.imgSearchGray500,
-            height: 32.adaptSize,
-            width: 32.adaptSize,
-          ),
-          Padding(
-            padding: EdgeInsets.only(
-              left: 16.h,
-              top: 5.v,
-              bottom: 8.v,
-            ),
-            child: Text(
-              "Gender",
-              style: theme.textTheme.titleMedium,
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  /// Section Widget
   Widget _buildPincode(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 32.h),
@@ -309,7 +375,6 @@ class PersonalInfoPageScreen extends StatelessWidget {
     );
   }
 
-  /// Section Widget
   Widget _buildInputBoxOne(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 32.h),
@@ -331,7 +396,6 @@ class PersonalInfoPageScreen extends StatelessWidget {
     );
   }
 
-  /// Section Widget
   Widget _buildName(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 32.h),
@@ -354,7 +418,6 @@ class PersonalInfoPageScreen extends StatelessWidget {
     );
   }
 
-  /// Section Widget
   Widget _buildSave(BuildContext context) {
     return CustomElevatedButton(
       height: 60.v,
@@ -365,12 +428,11 @@ class PersonalInfoPageScreen extends StatelessWidget {
       ),
       buttonStyle: CustomButtonStyles.outlineBlue,
       buttonTextStyle: CustomTextStyles.titleMediumWhiteA700,
+      onPressed: _submitData,
     );
   }
 
-  /// Navigates back to the previous screen.
   onTapArrowleftone(BuildContext context) {
     Navigator.pop(context);
   }
 }
-

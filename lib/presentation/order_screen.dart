@@ -3,97 +3,143 @@ import 'package:intl/intl.dart';
 import '../../core/app_export.dart';
 import '../../theme/custom_button_style.dart';
 import '../../widgets/custom_elevated_button.dart';
-import '../../widgets/custom_text_form_field.dart'; 
-// ignore_for_file: must_be_immutable
+import '../../widgets/custom_text_form_field.dart';
+
 class OrderScreen extends StatelessWidget {
   OrderScreen({Key? key}) : super(key: key);
 
-  TextEditingController nameController = TextEditingController();
-  TextEditingController noteOneController = TextEditingController();
-  TextEditingController dateController = TextEditingController();
-  TextEditingController startTimeController = TextEditingController();
-  TextEditingController endTimeController = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController noteOneController = TextEditingController();
+  final TextEditingController dateController = TextEditingController();
+  final TextEditingController startTimeController = TextEditingController();
+  final TextEditingController endTimeController = TextEditingController();
 
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: theme.colorScheme.onPrimary,
-      resizeToAvoidBottomInset: false,
+      backgroundColor: theme.colorScheme.background,
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: theme.colorScheme.onBackground),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        title: Text(
+          "Order",
+          style: theme.textTheme.headlineMedium?.copyWith(color: theme.colorScheme.onBackground),
+        ),
+        backgroundColor: theme.colorScheme.background,
+        elevation: 0,
+      ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 40.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.arrow_back),
-                      onPressed: () {
-                        // Handle back button pressed
-                      },
-                    ),
-                    SizedBox(width: 10.0),
-                    Text(
-                      "Order",
-                      style: theme.textTheme.headlineMedium,
-                    ),
-                  ],
-                ),
-                SizedBox(height: 20.0),
-                CustomTextFormField(
-                  controller: nameController,
-                  hintText: "Event name*",
-                ),
-                SizedBox(height: 20.0),
-                CustomTextFormField(
-                  controller: noteOneController,
-                  hintText: "Type the note here...",
-                  maxLines: 4,
-                ),
-                SizedBox(height: 20.0),
-                InkWell(
-                  onTap: () {
-                    _selectDate(context);
-                  },
-                  child: IgnorePointer(
-                    child: TextFormField(
-                      controller: dateController,
-                      readOnly: true,
-                      decoration: InputDecoration(
-                        hintText: 'Date',
-                        suffixIcon: Icon(Icons.calendar_today),
-                      ),
-                    ),
+        padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildCard(
+                children: [
+                  CustomTextFormField(
+                    controller: nameController,
+                    hintText: "Event name*",
                   ),
-                ),
-                SizedBox(height: 20.0),
-                _buildRowSearching(
-                  context,
-                  timeType: "Start time",
-                  controller: startTimeController,
-                ),
-                SizedBox(height: 20.0),
-                _buildRowSearching(
-                  context,
-                  timeType: "End time",
-                  controller: endTimeController,
-                ),
-                SizedBox(height: 20.0),
-                CustomElevatedButton(
-                  height: 60.0,
-                  text: "Order",
-                  onPressed: () {
+                  SizedBox(height: 20.0),
+                  CustomTextFormField(
+                    controller: noteOneController,
+                    hintText: "Type the note here...",
+                    maxLines: 4,
+                  ),
+                ],
+              ),
+              SizedBox(height: 20.0),
+              _buildCard(
+                children: [
+                  _buildDatePicker(context),
+                ],
+              ),
+              SizedBox(height: 20.0),
+              _buildCard(
+                children: [
+                  _buildTimePicker(context, "Start time", startTimeController),
+                  SizedBox(height: 20.0),
+                  _buildTimePicker(context, "End time", endTimeController),
+                ],
+              ),
+              SizedBox(height: 30.0),
+              CustomElevatedButton(
+                height: 60.0,
+                text: "Order",
+                onPressed: () {
+                  if (_formKey.currentState?.validate() ?? false) {
                     // Handle order button pressed
-                  },
-                  buttonStyle: CustomButtonStyles.outlineBlueTL30,
-                  buttonTextStyle: CustomTextStyles.titleMediumOnPrimary18,
-                ),
-              ],
+                  }
+                },
+                buttonStyle: CustomButtonStyles.outlineBlueTL30,
+                buttonTextStyle: CustomTextStyles.titleMediumOnPrimary18,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCard({required List<Widget> children}) {
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      elevation: 3,
+      shadowColor: Colors.grey.withOpacity(0.2),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: children,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDatePicker(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        _selectDate(context);
+      },
+      child: IgnorePointer(
+        child: TextFormField(
+          controller: dateController,
+          readOnly: true,
+          decoration: InputDecoration(
+            hintText: 'Date',
+            suffixIcon: Icon(Icons.calendar_today, color: theme.colorScheme.primary),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTimePicker(BuildContext context, String timeType, TextEditingController controller) {
+    return InkWell(
+      onTap: () {
+        _selectTime(context, timeType, controller);
+      },
+      child: IgnorePointer(
+        child: TextFormField(
+          controller: controller,
+          readOnly: true,
+          decoration: InputDecoration(
+            hintText: timeType,
+            suffixIcon: Icon(Icons.access_time, color: theme.colorScheme.primary),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.0),
             ),
           ),
         ),
@@ -109,69 +155,10 @@ class OrderScreen extends StatelessWidget {
       lastDate: DateTime(DateTime.now().year + 5),
     );
     if (picked != null) {
-      // Format date without time
       final DateFormat formatter = DateFormat('yyyy-MM-dd');
       final String formattedDate = formatter.format(picked);
       dateController.text = formattedDate;
     }
-  }
-
-
-  Widget _buildRowSearching(BuildContext context, {required String timeType, required TextEditingController controller}) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 11.0, vertical: 13.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8.0),
-        color: Colors.blueGrey[50],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            timeType,
-            style: TextStyle(
-              color: Colors.blueGrey[300],
-              fontSize: 16.0,
-            ),
-          ),
-          SizedBox(height: 8.0),
-          Row(
-            children: [
-              GestureDetector(
-                onTap: () {
-                  _selectTime(context, timeType, controller);
-                },
-                child: Container(
-                  height: 32.0,
-                  width: 32.0,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8.0),
-                    color: Colors.blueGrey[300],
-                  ),
-                  child: Icon(
-                    Icons.access_time,
-                    size: 18.0,
-                  ),
-                ),
-              ),
-              SizedBox(width: 8.0),
-              Expanded(
-                child: TextFormField(
-                  controller: controller,
-                  readOnly: true,
-                  decoration: InputDecoration(
-                    hintText: 'Select time',
-                  ),
-                  onTap: () {
-                    _selectTime(context, timeType, controller);
-                  },
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
   }
 
   Future<void> _selectTime(BuildContext context, String timeType, TextEditingController controller) async {
@@ -180,7 +167,6 @@ class OrderScreen extends StatelessWidget {
       initialTime: TimeOfDay.now(),
     );
     if (picked != null) {
-      // Format time in 24-hour format
       final hour = picked.hour.toString().padLeft(2, '0');
       final minute = picked.minute.toString().padLeft(2, '0');
       controller.text = '$hour:$minute';

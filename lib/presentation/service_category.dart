@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import '../../core/app_export.dart';
 import '../../theme/custom_button_style.dart';
 import '../../widgets/custom_elevated_button.dart';
@@ -13,7 +15,26 @@ class ServiceCategoryScreen extends StatefulWidget {
 
 class _ServiceCategoryScreenState extends State<ServiceCategoryScreen> {
   final TextEditingController searchController = TextEditingController();
-  String? selectedCategory; // variable to store the selected category
+  String? selectedCategory;
+  late List<String> categories = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchCategories();
+  }
+
+  Future<void> fetchCategories() async {
+    final response = await http.get(Uri.parse('http://10.0.2.2:5000/product-categories'));
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      setState(() {
+        categories = data.map((item) => item['name'].toString()).toList();
+      });
+    } else {
+      throw Exception('Failed to load categories');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +57,7 @@ class _ServiceCategoryScreenState extends State<ServiceCategoryScreen> {
                 ),
                 SizedBox(height: 25),
                 _buildCategoryList(context),
-                SizedBox(height: 80), // added space for the bottom button
+                SizedBox(height: 80),
               ],
             ),
           ),
@@ -94,17 +115,7 @@ class _ServiceCategoryScreenState extends State<ServiceCategoryScreen> {
   );
 }
 
-
   void onTapImgArrowLeft(BuildContext context) {
     Navigator.pop(context);
   }
-
-  static const List<String> categories = [
-    "Architecture",
-    "Advertising Service",
-    "Hospital & Healthcare",
-    "Information Technology",
-    "Food Services",
-    "Fitness Services",
-  ];
 }

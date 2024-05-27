@@ -25,8 +25,8 @@ class ProfileScreen extends StatelessWidget {
               return Center(child: Text('Error: ${snapshot.error}'));
             } else {
               final SharedPreferences prefs = snapshot.data!;
-              final String? name = prefs.getString('username'); // Mengambil nama dari SharedPreferences
-              final String? photoPath = prefs.getString('photoUrl'); // Mengambil foto dari SharedPreferences
+              final String? name = prefs.getString('username');
+              final String? photoPath = prefs.getString('photoUrl');
 
               return SingleChildScrollView(
                 padding: EdgeInsets.all(16),
@@ -38,7 +38,7 @@ class ProfileScreen extends StatelessWidget {
                       child: CircleAvatar(
                         radius: 59.h,
                         backgroundImage: photoPath != null
-                            ? NetworkImage(photoPath) // Gunakan NetworkImage untuk URL gambar
+                            ? NetworkImage(photoPath)
                             : AssetImage('assets/images/default_photo.jpg') as ImageProvider<Object>,
                       ),
                     ),
@@ -63,48 +63,11 @@ class ProfileScreen extends StatelessWidget {
                       title: "Service Set-up",
                       description: "Mention your job - experience, Project work and certification",
                     ),
+                    SizedBox(height: 24.v),
+                    _buildLogoutButton(context), // Added logout button
                   ],
                 ),
               );
-            }
-          },
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: 3, // Indeks untuk ProfileScreen
-          selectedItemColor: Colors.blue, // Warna biru untuk item yang dipilih
-          unselectedItemColor: Colors.grey, // Warna abu-abu untuk item yang tidak dipilih
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.local_offer),
-              label: 'Service',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.history),
-              label: 'Order History',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: 'Profile',
-            ),
-          ],
-          onTap: (index) {
-            switch (index) {
-            case 0:
-              Navigator.pushNamed(context, '/home');
-              break;
-            case 1:
-              Navigator.pushNamed(context, '/service_page');
-              break;
-            case 2:
-              Navigator.pushNamed(context, '/order_recent_screen');
-              break;
-            case 3:
-              Navigator.pushNamed(context, '/profile');
-              break;
             }
           },
         ),
@@ -166,6 +129,37 @@ class ProfileScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+Widget _buildLogoutButton(BuildContext context) {
+  return Padding(
+    padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
+    child: SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: () => _logout(context),
+        style: ElevatedButton.styleFrom(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)), // Rounded corners
+          backgroundColor: Colors.red, // Set warna latar belakang tombol
+        ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 16.0),
+          child: Text(
+            'Logout',
+            style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.white), // Set warna teks
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+
+
+  void _logout(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear(); // Clear SharedPreferences
+    Navigator.pushReplacementNamed(context, '/login');
   }
 }
 

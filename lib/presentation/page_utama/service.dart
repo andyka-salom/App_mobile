@@ -115,45 +115,6 @@ class _ServicePageState extends State<ServicePage>
           }
         },
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 1, // Index 1 mengarah ke halaman service
-        selectedItemColor: Colors.blue, // Warna aktif biru
-        unselectedItemColor: Colors.grey, // Warna tidak aktif abu-abu
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.local_offer),
-            label: 'Service',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.history),
-            label: 'Order History',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-        onTap: (index) {
-          switch (index) {
-            case 0:
-              Navigator.pushNamed(context, '/home');
-              break;
-            case 1:
-              Navigator.pushNamed(context, '/service_page');
-              break;
-            case 2:
-              Navigator.pushNamed(context, '/order_recent_screen');
-              break;
-            case 3:
-              Navigator.pushNamed(context, '/profile');
-              break;
-          }
-        },
-      ),
     );
   }
 

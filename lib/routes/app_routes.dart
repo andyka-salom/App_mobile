@@ -33,7 +33,7 @@ class AppRoutes {
     // Halaman utama
     splashScreen: (context) => SplashScreen(),
     signinScreenOneScreen: (context) => SigninScreenOneScreen(),
-    profile: (context) => ProfileScreen(), // Mengubah ProfilScreen menjadi ProfileScreen
+    profile: (context) => ProfileScreen(), 
     orderRecentScreen: (context) => HistoryPage.OrderRecentScreen(),
     signupPageOneScreen: (context) => SignupPageOneScreen(),
     service_page: (context) => ServicePage(),
@@ -46,6 +46,6 @@ class AppRoutes {
     '/servicecategory': (context) => ServiceCategoryScreen(),
     '/detail_order': (context) => DetailOrderScreen(), 
     
-    initialRoute: (context) => SplashScreen()
+    initialRoute: (context) => ProfileScreen(),
   };
 }

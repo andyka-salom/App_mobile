@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../core/app_export.dart';
-// import '../../../widgets/app_bar/appbar_leading_image.dart';
-// import '../../../widgets/app_bar/appbar_title.dart';
-// import '../../../widgets/app_bar/custom_app_bar.dart';
-import '../../../widgets/custom_elevated_button.dart';
 
 class OrderRecentScreen extends StatelessWidget {
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey();
@@ -12,59 +8,21 @@ class OrderRecentScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: theme.colorScheme.onPrimary,
-        resizeToAvoidBottomInset: false,
+        backgroundColor: theme.colorScheme.background,
         appBar: _buildAppBar(context),
         body: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 16.h),
+          padding: EdgeInsets.symmetric(horizontal: 16),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              SizedBox(height: 20),
               _buildProfileDetails(context),
-              SizedBox(height: 15.v),
+              SizedBox(height: 15),
               // Add other profile details here
             ],
           ),
         ),
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: 2, // Indeks untuk OrderRecentScreen
-          selectedItemColor: Colors.blue, // Warna biru untuk item yang dipilih
-          unselectedItemColor: Colors.grey, // Warna abu-abu untuk item yang tidak dipilih
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.local_offer),
-              label: 'Service',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.history),
-              label: 'Order History',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: 'Profile',
-            ),
-          ],
-          onTap: (index) {
-            switch (index) {
-              case 0:
-                Navigator.pushNamed(context, '/home');
-                break;
-              case 1:
-                Navigator.pushNamed(context, '/service_page');
-                break;
-              case 2:
-                Navigator.pushNamed(context, '/order_recent_screen');
-                break;
-              case 3:
-                Navigator.pushNamed(context, '/profile');
-                break;
-            }
-          },
-        ),
-      ),
+       ),
     );
   }
 
@@ -87,9 +45,17 @@ class OrderRecentScreen extends StatelessWidget {
 
   Widget _buildProfileDetails(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(16.h),
-      decoration: AppDecoration.outlineBlueGray.copyWith(
-        borderRadius: BorderRadius.circular(15.h),
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15),
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 5,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,48 +64,64 @@ class OrderRecentScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildAvatar(),
-              SizedBox(width: 20.h),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Andrew Michel",
-                    style: CustomTextStyles.bodyMediumGray800.copyWith(
-                      color: appTheme.indigoA200,
+              SizedBox(width: 20),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Andrew Michel",
+                      style: TextStyle(
+                        color: appTheme.indigoA200,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 14.v),
-                  Text(
-                    "Sr. Android Developer at",
-                    style: CustomTextStyles.bodyMedium14_1,
-                  ),
-                  Text(
-                    "Poler Web-design",
-                    style: CustomTextStyles.bodyMediumIndigoA200,
-                  ),
-                  SizedBox(height: 8.v),
-                  Row(
-                    children: [
-                      CustomImageView(
-                        imagePath: ImageConstant.imgLinkIc,
-                        height: 16.adaptSize,
-                        width: 16.adaptSize,
+                    SizedBox(height: 8),
+                    Text(
+                      "Sr. Android Developer at",
+                      style: TextStyle(fontSize: 14),
+                    ),
+                    Text(
+                      "Poler Web-design",
+                      style: TextStyle(
+                        color: appTheme.indigoA200,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
                       ),
-                      SizedBox(width: 8.h),
-                      Text(
-                        "2k+ Connection",
-                        style: theme.textTheme.bodyMedium!.copyWith(
-                          color: appTheme.blueGray600,
+                    ),
+                    SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Icon(Icons.person_outline, size: 16, color: appTheme.blueGray600),
+                        SizedBox(width: 4),
+                        Text(
+                          "2k+ Connection",
+                          style: TextStyle(
+                            color: appTheme.blueGray600,
+                            fontSize: 12,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
-          SizedBox(height: 23.v),
-          _buildActionButtons(context),
+          SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              _buildButton(context, "Done", () {
+                // Add logic for "Done" button here
+              }),
+              SizedBox(width: 10),
+              _buildButton(context, "Detail", () {
+                // Add logic for "Detail" button here
+              }),
+            ],
+          ),
         ],
       ),
     );
@@ -147,40 +129,29 @@ class OrderRecentScreen extends StatelessWidget {
 
   Widget _buildAvatar() {
     return CircleAvatar(
-      radius: 28.h,
+      radius: 28,
       backgroundImage: AssetImage('assets/images/img_avatar_56x56.png'),
       backgroundColor: Colors.grey, // Default color if image is not available
     );
   }
 
-  Widget _buildActionButtons(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        _buildButton(context, "Done", () {
-          // Add logic for "Done" button here
-        }),
-        SizedBox(width: 9.h),
-        _buildButton(context, "Detail", () {
-          // Add logic for "Detail" button here
-        }),
-      ],
-    );
-  }
-
   Widget _buildButton(BuildContext context, String text, VoidCallback onPressed) {
-    return CustomElevatedButton(
-      width: 92.h,
-      text: text,
-      buttonTextStyle: theme.textTheme.titleMedium!.copyWith(
-        color: Colors.white, // Change text color to white
+  return ElevatedButton(
+    onPressed: onPressed,
+    style: ElevatedButton.styleFrom(
+      backgroundColor: Colors.blue,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
       ),
-      onPressed: onPressed,
-    );
-  }
+    ),
+    child: Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+      child: Text(
+        text,
+        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      ),
+    ),
+  );
+}
 
-  // Method for navigating back
-  void onTapArrowLeft(BuildContext context) {
-    // Add logic for navigating back here
-  }
 }
