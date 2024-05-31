@@ -46,6 +46,6 @@ class AppRoutes {
     '/servicecategory': (context) => ServiceCategoryScreen(),
     '/detail_order': (context) => DetailOrderScreen(), 
     
-    initialRoute: (context) => ProfileScreen(),
+    initialRoute: (context) => ServicePage(),
   };
 }

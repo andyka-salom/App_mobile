@@ -1,182 +1,210 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import '../page_utama/home.dart';
-import '../page_utama/profile.dart';
-import '../page_utama/history.dart';
+import 'dart:convert';
+import '../page_utama/detailproduct.dart';
 
 class ServicePage extends StatefulWidget {
+  static const String servicePage = '/service_page';
+  static const String profile = '/profile';
+  static const String orderRecentScreen = '/order_recent_screen';
+
   @override
   _ServicePageState createState() => _ServicePageState();
 }
 
-class _ServicePageState extends State<ServicePage>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  late Future<List<Category>> _categoryFuture;
-  late Map<int, Future<List<Product>>> _productFutures;
+class _ServicePageState extends State<ServicePage> {
+  late int _selectedTabIndex = 0;
+  late List<dynamic> _categories = [];
+  late List<dynamic> _products = [];
+  TextEditingController _searchController = TextEditingController();
+  int _currentBannerIndex = 0;
+
+  final List<String> _bannerImages = [
+    'assets/images/banner1.jpg',
+    'assets/images/banner2.jpg',
+  ];
 
   @override
   void initState() {
     super.initState();
-    _productFutures = {};
-    _categoryFuture = fetchCategories();
-    _categoryFuture.then((categories) {
-      _tabController =
-          TabController(length: categories.length, vsync: this);
-      setState(() {});
+    _fetchCategories();
+    _startBannerAnimation();
+  }
+
+  void _startBannerAnimation() {
+    Future.delayed(Duration(seconds: 5), () {
+      setState(() {
+        _currentBannerIndex = (_currentBannerIndex + 1) % _bannerImages.length;
+      });
+      _startBannerAnimation();
     });
   }
 
-  Future<List<Category>> fetchCategories() async {
-    final response =
-        await http.get(Uri.parse('http://10.0.2.2:5000/product-categories'));
+
+  Future<void> _fetchCategories() async {
+    final response = await http.get(Uri.parse('http://10.0.2.2:5000/product-categories'));
     if (response.statusCode == 200) {
-      Iterable data = json.decode(response.body);
-      return List<Category>.from(
-          data.map((model) => Category.fromJson(model)));
+      setState(() {
+        _categories = json.decode(response.body);
+      });
+      _fetchProducts(_categories[0]['id'].toString());
     } else {
       throw Exception('Failed to load categories');
     }
   }
 
-  Future<List<Product>> fetchProductsByCategory(int categoryId) async {
-    final response = await http.get(
-        Uri.parse('http://10.0.2.2:5000/products/category/$categoryId'));
+  Future<void> _fetchProducts(String categoryId) async {
+    final response = await http.get(Uri.parse('http://10.0.2.2:5000/products/category/$categoryId'));
     if (response.statusCode == 200) {
-      Iterable data = json.decode(response.body);
-      return List<Product>.from(
-          data.map((model) => Product.fromJson(model)));
+      setState(() {
+        _products = json.decode(response.body);
+      });
     } else {
-      throw Exception('Failed to load products for category $categoryId');
+      throw Exception('Failed to load products');
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: Row(
+Widget build(BuildContext context) {
+  return SafeArea(
+    child: Scaffold(
+      backgroundColor: Colors.grey[100],
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: Text("Service"),
+            SizedBox(height: 16),
+            Container(
+              width: double.infinity,
+              alignment: Alignment.topCenter, // Menambahkan alignment ke atas
+              child: Image.asset(
+                _bannerImages[0], // Menggunakan banner pertama saja
+                fit: BoxFit.cover,
+              ),
             ),
+            SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16.0, 1.0, 16.0, 16.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.2),
+                      spreadRadius: 3,
+                      blurRadius: 5,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _searchController,
+                          decoration: InputDecoration(
+                            hintText: 'Search...',
+                            border: InputBorder.none,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.search),
+                        onPressed: () {
+                          // Handle search button tap
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 16),
+            _buildTabs(),
+            SizedBox(height: 20),
+            _buildTabContent(),
           ],
         ),
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(kToolbarHeight + 50),
-          child: Column(
-            children: [
-              _buildSearchInput(),
-              FutureBuilder(
-                future: _categoryFuture,
-                builder: (context, AsyncSnapshot<List<Category>> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else {
-                    return snapshot.hasData
-                        ? Container(
-                            color: Colors.white,
-                            padding: EdgeInsets.only(top: 8),
-                            child: TabBar(
-                              controller: _tabController,
-                              indicatorColor: Colors.blue,
-                              tabs: snapshot.data!
-                                  .map((category) => Tab(text: category.name))
-                                  .toList(),
-                            ),
-                          )
-                        : Container();
-                  }
-                },
-              ),
-            ],
-          ),
-        ),
       ),
-      body: FutureBuilder(
-        future: _categoryFuture,
-        builder: (context, AsyncSnapshot<List<Category>> categorySnapshot) {
-          if (categorySnapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (categorySnapshot.hasError) {
-            return Center(child: Text('Error: ${categorySnapshot.error}'));
-          } else {
-            return TabBarView(
-              controller: _tabController,
-              children: categorySnapshot.data!.map((category) {
-                return _buildProductList(category.id);
-              }).toList(),
-            );
-          }
-        },
-      ),
-    );
-  }
+    ),
+  );
+}
 
-  Widget _buildSearchInput() {
-    return Container(
-      margin: EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 1,
-            blurRadius: 3,
-            offset: Offset(0, 2),
-          ),
+
+
+  Widget _buildTabs() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          for (int i = 0; i < _categories.length; i++)
+            _buildTabItem(_categories[i]['name'], _categories[i]['id'], i),
         ],
       ),
-      child: TextField(
-        decoration: InputDecoration(
-          hintText: 'Search...',
-          prefixIcon: Icon(Icons.search),
-          border: InputBorder.none,
+    );
+  }
+
+  Widget _buildTabItem(String title, int id, int index) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedTabIndex = 0;
+        });
+        _fetchProducts(id.toString());
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 8.0),
+        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        decoration: BoxDecoration(
+          color: _selectedTabIndex == 0 ? Colors.blue : Colors.transparent,
+          borderRadius: BorderRadius.circular(20.0),
+          border: _selectedTabIndex == 0
+              ? null
+              : Border.all(color: Colors.grey),
         ),
-        style: TextStyle(color: Colors.black),
+        child: Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: _selectedTabIndex == 0 ? Colors.white : Colors.grey,
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildProductList(int categoryId) {
-    if (!_productFutures.containsKey(categoryId)) {
-      _productFutures[categoryId] = fetchProductsByCategory(categoryId);
+  Widget _buildTabContent() {
+    if (_products.isEmpty) {
+      return Center(
+        child: Text('No products available in this category'),
+      );
+    } else {
+      return GridView.builder(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 10.0,
+          mainAxisSpacing: 10.0,
+        ),
+        itemCount: _products.length,
+        itemBuilder: (context, index) {
+          return _buildProductCard(_products[index]);
+        },
+      );
     }
-
-    return FutureBuilder(
-      future: _productFutures[categoryId],
-      builder: (context, AsyncSnapshot<List<Product>> productSnapshot) {
-        if (productSnapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
-        } else if (productSnapshot.hasError) {
-          return Center(child: Text('Error: ${productSnapshot.error}'));
-        } else {
-          return GridView.builder(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 10.0,
-              mainAxisSpacing: 10.0,
-            ),
-            itemCount: productSnapshot.data!.length,
-            itemBuilder: (context, index) {
-              final product = productSnapshot.data![index];
-              return _buildProductCard(product);
-            },
-          );
-        }
-      },
-    );
   }
 
-  Widget _buildProductCard(Product product) {
+  Widget _buildProductCard(Map<String, dynamic> product) {
+    final Map<String, dynamic> user = product['user'];
+
     return Card(
       elevation: 3,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15.0),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -186,9 +214,9 @@ class _ServicePageState extends State<ServicePage>
               children: [
                 Positioned.fill(
                   child: ClipRRect(
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
                     child: Image.network(
-                      product.user.photoUrl, // Gunakan photoUrl dari user
+                      user['photo_url'],
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -196,12 +224,19 @@ class _ServicePageState extends State<ServicePage>
                 Positioned(
                   bottom: 8,
                   left: 8,
-                  child: Text(
-                    product.name, // Tampilkan nama produk
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                    decoration: BoxDecoration(
+                      color: Colors.black54,
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: Text(
+                      product['name'],
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
@@ -217,7 +252,7 @@ class _ServicePageState extends State<ServicePage>
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Text(
-                    'Price: \$${product.price.toStringAsFixed(2)}', // Tampilkan harga produk
+                    'Price: \$${product['price'].toStringAsFixed(2)}',
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.black87,
@@ -230,7 +265,14 @@ class _ServicePageState extends State<ServicePage>
                       height: 30,
                       child: ElevatedButton(
                         onPressed: () {
-                          // Action when order button is pressed
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DetailProductPage(
+                                productId: product['id'].toString(),
+                              ),
+                            ),
+                          );
                         },
                         style: ButtonStyle(
                           backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
@@ -260,62 +302,3 @@ class _ServicePageState extends State<ServicePage>
   }
 }
 
-class Category {
-  final int id;
-  final String name;
-
-  Category({required this.id, required this.name});
-
-  factory Category.fromJson(Map<String, dynamic> json) {
-    return Category(
-      id: json['id'],
-      name: json['name'],
-    );
-  }
-}
-
-class Product {
-  final int id;
-  final String name;
-  final double price;
-  final User user;
-
-  Product({required this.id, required this.name, required this.price, required this.user});
-
-  factory Product.fromJson(Map<String, dynamic> json) {
-    return Product(
-      id: json['id'],
-      name: json['name'],
-      price: json['price'].toDouble(),
-      user: User.fromJson(json['user']),
-    );
-  }
-}
-
-class User {
-  final int id;
-  final String username;
-  final String photoUrl; // Ubah menjadi photoUrl
-
-  User({required this.id, required this.username, required this.photoUrl});
-
-  factory User.fromJson(Map<String, dynamic> json) {
-    return User(
-      id: json['id'],
-      username: json['username'],
-      photoUrl: json['photo_url'], // Sesuaikan dengan struktur JSON
-    );
-  }
-}
-
-void main() {
-  runApp(MaterialApp(
-    initialRoute: '/service_page', // Set halaman awal ke halaman service
-    routes: {
-      '/service_page': (context) => ServicePage(),
-      '/profile': (context) => ProfileScreen(),
-      '/order_recent_screen': (context) => OrderRecentScreen(),
-      '/home': (context) => HomePage(),
-    },
-  ));
-}

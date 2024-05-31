@@ -5,7 +5,6 @@ import 'dart:convert';
 class DetailProductPage extends StatefulWidget {
   static const routeName = '/detail_product';
 
-  // Tambahkan parameter productId pada konstruktor
   final String productId;
 
   const DetailProductPage({Key? key, required this.productId}) : super(key: key);
@@ -20,7 +19,6 @@ class _DetailProductPageState extends State<DetailProductPage> {
   @override
   void initState() {
     super.initState();
-    // Menggunakan ID produk dari widget.productId
     _fetchProductData(widget.productId);
   }
 
@@ -152,17 +150,17 @@ class _DetailProductPageState extends State<DetailProductPage> {
                           ),
                         ),
                         SizedBox(height: 8),
-                        Text(
-                          'Phone: ${_productData['user']['mobile']}',
-                          style: TextStyle(fontSize: 16, color: Colors.black87),
+                        ListTile(
+                          leading: Icon(Icons.phone),
+                          title: Text('Phone: ${_productData['user']['mobile']}'),
                         ),
-                        Text(
-                          'Email: ${_productData['user']['email']}',
-                          style: TextStyle(fontSize: 16, color: Colors.black87),
+                        ListTile(
+                          leading: Icon(Icons.email),
+                          title: Text('Email: ${_productData['user']['email']}'),
                         ),
-                        Text(
-                          'Address: ${_productData['user']['address'] ?? "-"}',
-                          style: TextStyle(fontSize: 16, color: Colors.black87),
+                        ListTile(
+                          leading: Icon(Icons.location_on),
+                          title: Text('Address: ${_productData['user']['address'] ?? "-"}'),
                         ),
                         SizedBox(height: 24),
                         ElevatedButton(
