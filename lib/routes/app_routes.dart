@@ -10,6 +10,7 @@ import '../presentation/order_screen.dart';
 import '../presentation/page_utama/splash_screen.dart'; 
 import '../presentation/page_utama/service.dart';
 import '../presentation/page_utama/home.dart';
+import '../presentation/navbar.dart';
 import '../presentation/page_utama/profile.dart'; // Import ProfilScreen
 
 class AppRoutes {
@@ -23,6 +24,8 @@ class AppRoutes {
   static const String orderRecentScreen = '/order_recent_screen'; // Halaman History
   static const String homepage = "/home"; // Halaman home
   // End Page Utama
+
+  static const String navbar = "/navbar";
 
   static const String orderscreen = '/order_screen';
   static const String newPage = '/detail_order';
@@ -38,6 +41,7 @@ class AppRoutes {
     signupPageOneScreen: (context) => SignupPageOneScreen(),
     service_page: (context) => ServicePage(),
     homepage: (context) => HomePage(),
+    navbar: (context) => NavBarPage(),
     // End Halaman utama
 
     orderscreen: (context) => OrderScreen(),
@@ -46,6 +50,6 @@ class AppRoutes {
     '/servicecategory': (context) => ServiceCategoryScreen(),
     '/detail_order': (context) => DetailOrderScreen(), 
     
-    initialRoute: (context) => ServicePage(),
+    initialRoute: (context) => NavBarPage(),
   };
 }

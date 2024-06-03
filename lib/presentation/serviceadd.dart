@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:dotted_border/dotted_border.dart';
 import '../../core/app_export.dart';
 import '../../theme/custom_button_style.dart';
 import '../../widgets/app_bar/appbar_leading_image.dart';
@@ -69,21 +68,9 @@ class ServiceAddScreen extends StatelessWidget {
                         _buildNameEditText(context),
                         SizedBox(height: 24.v),
                         _buildLocationEditText(context),
-                        SizedBox(height: 35.v),
-                        Padding(
-                          padding: EdgeInsets.only(left: 8.h),
-                          child: Text(
-                            "Service Details",
-                            style: theme.textTheme.titleLarge,
-                          ),
-                        ),
-                        SizedBox(height: 29.v),
-                        _buildServiceTitleEditText(context),
                         SizedBox(height: 24.v),
                         _buildServiceDescriptionEditText(context),
                         SizedBox(height: 39.v),
-                        _buildFileUploadColumn(context),
-                        SizedBox(height: 17.v)
                       ],
                     ),
                   ),
@@ -245,49 +232,6 @@ class ServiceAddScreen extends StatelessWidget {
         vertical: 20.v,
       ),
       borderDecoration: TextFormFieldStyleHelper.outlineGrayTL30,
-    );
-  }
-
-  /// Section Widget
-  Widget _buildFileUploadColumn(BuildContext context) {
-    return DottedBorder(
-      color: appTheme.gray300,
-      padding: EdgeInsets.only(
-        left: 1.h,
-        top: 1.v,
-        right: 1.h,
-        bottom: 1.v,
-      ),
-      strokeWidth: 1.h,
-      radius: Radius.circular(16),
-      borderType: BorderType.RRect,
-      dashPattern: [16, 16],
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: 130.h,
-          vertical: 35.v,
-        ),
-        decoration: AppDecoration.outlineGray.copyWith(
-          borderRadius: BorderRadiusStyle.roundedBorder15,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(height: 3.v),
-            CustomImageView(
-              imagePath: ImageConstant.imgFileUploadIc,
-              height: 32.adaptSize,
-              width: 32.adaptSize,
-            ),
-            SizedBox(height: 14.v),
-            Text(
-              "Upload Files",
-              style: CustomTextStyles.bodyLargePrimary,
-            )
-          ],
-        ),
-      ),
     );
   }
 

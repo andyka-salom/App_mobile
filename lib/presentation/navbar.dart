@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart'; // Import untuk mengatur border radius
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../presentation/page_utama/home.dart';
 import '../presentation/page_utama/service.dart';
@@ -46,42 +46,56 @@ class _NavBarPageState extends State<NavBarPage> {
   }
 
   Widget _buildBottomNav() {
-    return ClipRRect(
-      borderRadius: BorderRadius.only(
-        topLeft: Radius.circular(20.0),
-        topRight: Radius.circular(20.0),
-      ),
-      child: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        onTap: (index) {
-          setState(() {
-            _currentPageIndex = index;
-            _pageController.jumpToPage(index);
-          });
-        },
-        currentIndex: _currentPageIndex,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey,
-        backgroundColor: Colors.white, // Warna background
-        elevation: 10.0, // Elevation untuk menampilkan shadow
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.build),
-            label: 'Service',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.history),
-            label: 'History',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            spreadRadius: 2,
+            blurRadius: 8,
           ),
         ],
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20.0),
+          topRight: Radius.circular(20.0),
+        ),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20.0),
+          topRight: Radius.circular(20.0),
+        ),
+        child: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          onTap: (index) {
+            setState(() {
+              _currentPageIndex = index;
+              _pageController.jumpToPage(index);
+            });
+          },
+          currentIndex: _currentPageIndex,
+          selectedItemColor: Colors.blue,
+          unselectedItemColor: Colors.grey,
+          items: const [
+            BottomNavigationBarItem(
+              icon: FaIcon(FontAwesomeIcons.home, size: 24),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: FaIcon(FontAwesomeIcons.toolbox, size: 24),
+              label: 'Service',
+            ),
+            BottomNavigationBarItem(
+              icon: FaIcon(FontAwesomeIcons.clock, size: 24),
+              label: 'History',
+            ),
+            BottomNavigationBarItem(
+              icon: FaIcon(FontAwesomeIcons.userCircle, size: 24),
+              label: 'Profile',
+            ),
+          ],
+        ),
       ),
     );
   }

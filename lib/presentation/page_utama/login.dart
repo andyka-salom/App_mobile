@@ -223,7 +223,7 @@ class SigninScreenOneScreen extends StatelessWidget {
           print('Address: ${userFromPrefs.address ?? "Not Provided"}');
         }
 
-        Navigator.pushReplacementNamed(context, '/profil');
+        Navigator.pushReplacementNamed(context, '/navbar');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
