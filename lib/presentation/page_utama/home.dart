@@ -163,7 +163,6 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
-        
       ),
     );
   }
@@ -184,7 +183,7 @@ class _HomePageState extends State<HomePage> {
     return GestureDetector(
       onTap: () {
         setState(() {
-          _selectedTabIndex = 0;
+          _selectedTabIndex = index;
         });
         _fetchProducts(id.toString());
       },
@@ -192,9 +191,9 @@ class _HomePageState extends State<HomePage> {
         margin: EdgeInsets.symmetric(horizontal: 8.0),
         padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
         decoration: BoxDecoration(
-          color: _selectedTabIndex == 0 ? Colors.blue : Colors.transparent,
+          color: _selectedTabIndex == index ? Colors.blue : Colors.transparent,
           borderRadius: BorderRadius.circular(20.0),
-          border: _selectedTabIndex == 0
+          border: _selectedTabIndex == index
               ? null
               : Border.all(color: Colors.grey),
         ),
@@ -202,7 +201,7 @@ class _HomePageState extends State<HomePage> {
           title,
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: _selectedTabIndex == 0 ? Colors.white : Colors.grey,
+            color: _selectedTabIndex == index ? Colors.white : Colors.grey,
           ),
         ),
       ),
@@ -232,106 +231,118 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildProductCard(Map<String, dynamic> product) {
-  final Map<String, dynamic> user = product['user'];
+    final Map<String, dynamic> user = product['user'];
 
-  return Card(
-    elevation: 3,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(15.0),
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(
-          flex: 3,
-          child: Stack(
-            children: [
-              Positioned.fill(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
-                  child: Image.network(
-                    user['photo_url'],
-                    fit: BoxFit.cover,
-                  ),
-                ),
+    return Card(
+      elevation: 3,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15.0),
+      ),
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DetailProductPage(
+                productId: product['id'].toString(),
               ),
-              Positioned(
-                bottom: 8,
-                left: 8,
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                  decoration: BoxDecoration(
-                    color: Colors.black54,
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: Text(
-                    product['name'],
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+            ),
+          );
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              flex: 3,
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+                      child: Image.network(
+                        user['photo_url'],
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        Expanded(
-          flex: 2,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Text(
-                  'Price: \$${product['price'].toStringAsFixed(2)}',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.black87,
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: SizedBox(
-                    width: 100,
-                    height: 30,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => DetailProductPage(
-                              productId: product['id'].toString(),
-                            ),
-                          ),
-                        );
-                      },
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
-                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20.0),
-                          ),
-                        ),
+                  Positioned(
+                    bottom: 8,
+                    left: 8,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                      decoration: BoxDecoration(
+                        color: Colors.black54,
+                        borderRadius: BorderRadius.circular(8.0),
                       ),
                       child: Text(
-                        'Order',
+                        product['name'],
                         style: TextStyle(
                           fontSize: 16,
+                          fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
+            Expanded(
+              flex: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Text(
+                      'Price: \$${product['price'].toStringAsFixed(2)}',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: SizedBox(
+                        width: 100,
+                        height: 30,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DetailProductPage(
+                                  productId: product['id'].toString(),
+                                ),
+                              ),
+                            );
+                          },
+                          style: ButtonStyle(
+                            backgroundColor: WidgetStateProperty.all<Color>(Colors.blue),
+                            shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              ),
+                            ),
+                          ),
+                          child: Text(
+                            'Order',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
-      ],
-    ),
-  );
-}
+      ),
+    );
+  }
 }

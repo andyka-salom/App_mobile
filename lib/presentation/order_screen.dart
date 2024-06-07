@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../core/app_export.dart';
-import '../../theme/custom_button_style.dart';
-import '../../widgets/custom_elevated_button.dart';
-import '../../widgets/custom_text_form_field.dart';
-
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import '../presentation/payment.dart';
 class OrderScreen extends StatelessWidget {
-  OrderScreen({Key? key}) : super(key: key);
+  final String productId;
 
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController noteOneController = TextEditingController();
+  OrderScreen({Key? key, required this.productId}) : super(key: key);
+
   final TextEditingController dateController = TextEditingController();
   final TextEditingController startTimeController = TextEditingController();
   final TextEditingController endTimeController = TextEditingController();
@@ -19,42 +18,16 @@ class OrderScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
       appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: theme.colorScheme.onBackground),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-        title: Text(
-          "Order",
-          style: theme.textTheme.headlineMedium?.copyWith(color: theme.colorScheme.onBackground),
-        ),
-        backgroundColor: theme.colorScheme.background,
-        elevation: 0,
+        title: Text('Order'),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+        padding: EdgeInsets.all(20.0),
         child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildCard(
-                children: [
-                  CustomTextFormField(
-                    controller: nameController,
-                    hintText: "Event name*",
-                  ),
-                  SizedBox(height: 20.0),
-                  CustomTextFormField(
-                    controller: noteOneController,
-                    hintText: "Type the note here...",
-                    maxLines: 4,
-                  ),
-                ],
-              ),
               SizedBox(height: 20.0),
               _buildCard(
                 children: [
@@ -70,17 +43,30 @@ class OrderScreen extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 30.0),
-              CustomElevatedButton(
-                height: 60.0,
-                text: "Order",
-                onPressed: () {
-                  if (_formKey.currentState?.validate() ?? false) {
-                    // Handle order button pressed
-                  }
-                },
-                buttonStyle: CustomButtonStyles.outlineBlueTL30,
-                buttonTextStyle: CustomTextStyles.titleMediumOnPrimary18,
-              ),
+              Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 35.0),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState?.validate() ?? false) {
+                        // Handle order button pressed
+                        _handleOrder(context);
+                      }
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: WidgetStateProperty.all<Color>(Colors.blue),
+                      padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
+                        EdgeInsets.symmetric(vertical: 25.0, horizontal: 120.0), // Sesuaikan dengan preferensi Anda
+                      ),
+                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0), // Ubah sesuai keinginan Anda
+                        ),
+                      ),
+                    ),
+                    child: Text('Order', style: TextStyle(color: Colors.white)),
+                  ),
+                ),
+
             ],
           ),
         ),
@@ -106,20 +92,18 @@ class OrderScreen extends StatelessWidget {
   }
 
   Widget _buildDatePicker(BuildContext context) {
-    return InkWell(
-      onTap: () {
+    return TextButton(
+      onPressed: () {
         _selectDate(context);
       },
-      child: IgnorePointer(
-        child: TextFormField(
-          controller: dateController,
-          readOnly: true,
-          decoration: InputDecoration(
-            hintText: 'Date',
-            suffixIcon: Icon(Icons.calendar_today, color: theme.colorScheme.primary),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.0),
-            ),
+      child: TextFormField(
+        controller: dateController,
+        enabled: false,
+        decoration: InputDecoration(
+          labelText: 'Date',
+          suffixIcon: Icon(Icons.calendar_today),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
           ),
         ),
       ),
@@ -127,20 +111,18 @@ class OrderScreen extends StatelessWidget {
   }
 
   Widget _buildTimePicker(BuildContext context, String timeType, TextEditingController controller) {
-    return InkWell(
-      onTap: () {
+    return TextButton(
+      onPressed: () {
         _selectTime(context, timeType, controller);
       },
-      child: IgnorePointer(
-        child: TextFormField(
-          controller: controller,
-          readOnly: true,
-          decoration: InputDecoration(
-            hintText: timeType,
-            suffixIcon: Icon(Icons.access_time, color: theme.colorScheme.primary),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.0),
-            ),
+      child: TextFormField(
+        controller: controller,
+        enabled: false,
+        decoration: InputDecoration(
+          labelText: timeType,
+          suffixIcon: Icon(Icons.access_time),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
           ),
         ),
       ),
@@ -172,4 +154,69 @@ class OrderScreen extends StatelessWidget {
       controller.text = '$hour:$minute';
     }
   }
+
+  void _handleOrder(BuildContext context) {
+    _sendOrderDetailsToServer(context);
+  }
+
+void _sendOrderDetailsToServer(BuildContext context) async {
+  // Send order details to server
+  final apiUrl = 'http://10.0.2.2:5000/transactions';
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  final userId = prefs.getInt('id') ?? 0;
+
+  final DateTime now = DateTime.now();
+  final DateFormat dateFormatter = DateFormat('yyyy-MM-dd');
+  final DateFormat timeFormatter = DateFormat('HH:mm');
+
+  final String bookingDate = dateFormatter.format(now);
+  final String startTime = timeFormatter.format(DateTime.parse('${dateFormatter.format(now)} ${startTimeController.text}'));
+  final String endTime = timeFormatter.format(DateTime.parse('${dateFormatter.format(now)} ${endTimeController.text}'));
+  final int productIdValue = int.tryParse(productId) ?? 0; // Convert to int, use default value 0 if parsing fails
+
+  final Map<String, dynamic> payload = {
+    "user_id": userId,
+    "status": "Waiting for Payment",
+    "booking_date": bookingDate,
+    "start_time": startTime,
+    "end_time": endTime,
+    "items": [
+      {
+        "product_id": productIdValue, // Use the converted value
+        "quantity": 1, 
+      }
+    ]
+  };
+
+  // Print data payload
+  print('Payload: $payload');
+
+  final response = await http.post(
+    Uri.parse(apiUrl),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: jsonEncode(payload),
+  );
+
+  // Handle response
+  if (response.statusCode == 201) {
+    // Order successful
+    // Extract transaction ID from response
+    final Map<String, dynamic> responseData = jsonDecode(response.body);
+    final int transactionId = responseData['id'];
+
+    // Navigate to another page with transaction ID
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+       builder: (context) => PaymentMethodScreen(transactionId: transactionId),
+      ),
+    );
+  } else {
+    // Order failed
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to place order')));
+  }
+}
+
 }

@@ -162,6 +162,6 @@ class ProfileScreen extends StatelessWidget {
   void _logout(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
-    Navigator.pushReplacementNamed(context, '/login');
+    Navigator.pushReplacementNamed(context, '/splash_screen');
   }
 }

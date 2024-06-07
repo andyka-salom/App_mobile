@@ -4,8 +4,8 @@ import '../core/app_export.dart';
 class CustomButtonStyles {
   // text button style
   static ButtonStyle get none => ButtonStyle(
-        backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
-        elevation: MaterialStateProperty.all<double>(0),
+        backgroundColor: WidgetStateProperty.all<Color>(Colors.transparent),
+        elevation: WidgetStateProperty.all<double>(0),
       );
         static ButtonStyle get outlineBlue => ElevatedButton.styleFrom(
         backgroundColor: theme.colorScheme.primary,

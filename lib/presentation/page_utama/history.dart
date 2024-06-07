@@ -1,157 +1,160 @@
 import 'package:flutter/material.dart';
-import '../../../core/app_export.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../payment.dart';
 
-class OrderRecentScreen extends StatelessWidget {
-  final GlobalKey<NavigatorState> navigatorKey = GlobalKey();
+class OrderRecentScreen extends StatefulWidget {
+  @override
+  _OrderRecentScreenState createState() => _OrderRecentScreenState();
+}
+
+class _OrderRecentScreenState extends State<OrderRecentScreen> {
+  List<dynamic> orders = [];
+  int userId = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserId();
+  }
+
+  _loadUserId() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getInt('id') ?? 0;
+      setState(() {
+        this.userId = userId;
+      });
+      fetchOrders();
+    } catch (error) {
+      print("Error: $error");
+    }
+  }
+
+  Future<void> fetchOrders() async {
+    final response = await http.get(Uri.parse('http://10.0.2.2:5000/transactions/user/$userId'));
+
+    if (response.statusCode == 200) {
+      setState(() {
+        orders = json.decode(response.body);
+      });
+    } else {
+      throw Exception('Failed to load orders');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: theme.colorScheme.background,
-        appBar: _buildAppBar(context),
-        body: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 20),
-              _buildProfileDetails(context),
-              SizedBox(height: 15),
-              // Add other profile details here
-            ],
-          ),
-        ),
-       ),
-    );
-  }
-
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return AppBar(
-      title: Text('Order History'),
-      leading: GestureDetector(
-        onTap: () => Navigator.pop(context),
-        child: Padding(
-          padding: EdgeInsets.all(8.0),
-          child: CustomImageView(
-            imagePath: ImageConstant.imgArrowLeftBlack90032x32,
-            height: 32.adaptSize,
-            width: 32.adaptSize,
-          ),
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Recent Orders'),
       ),
-    );
-  }
-
-  Widget _buildProfileDetails(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 5,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min, // Menyesuaikan ukuran Column dengan kontennya
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildAvatar(),
-              SizedBox(width: 20),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Andrew Michel",
-                      style: TextStyle(
-                        color: appTheme.indigoA200,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+          Expanded(
+            child: ListView.builder(
+              itemCount: orders.length,
+              itemBuilder: (BuildContext context, int index) {
+                dynamic order = orders[index];
+                return Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Card(
+                    elevation: 3,
+                    child: ListTile(
+                      contentPadding: EdgeInsets.all(16.0),
+                      leading: CircleAvatar(
+                        radius: 30,
+                        backgroundImage: NetworkImage(order['items'][0]['user_photo']),
                       ),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      "Sr. Android Developer at",
-                      style: TextStyle(fontSize: 14),
-                    ),
-                    Text(
-                      "Poler Web-design",
-                      style: TextStyle(
-                        color: appTheme.indigoA200,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
+                      title: Text(
+                        order['items'][0]['product_name'],
+                        style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
                       ),
-                    ),
-                    SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Icon(Icons.person_outline, size: 16, color: appTheme.blueGray600),
-                        SizedBox(width: 4),
-                        Text(
-                          "2k+ Connection",
-                          style: TextStyle(
-                            color: appTheme.blueGray600,
-                            fontSize: 12,
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('${order['booking_date']}'),
+                          Text('${order['status']}'),
+                        ],
+                      ),
+                      trailing: Column(
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              _showOrderDetails(context, order);
+                            },
+                            child: Text(
+                              'Detail',
+                              style: TextStyle(color: Colors.blue),
+                            ),
                           ),
-                        ),
-                      ],
+                          if (order['status'] == 'Waiting for Payment')
+                            TextButton(
+                              onPressed: () {
+                                _payOrder(order);
+                              },
+                              child: Text(
+                                'Pay',
+                                style: TextStyle(color: Colors.green),
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              _buildButton(context, "Done", () {
-                // Add logic for "Done" button here
-              }),
-              SizedBox(width: 10),
-              _buildButton(context, "Detail", () {
-                // Add logic for "Detail" button here
-              }),
-            ],
+                  ),
+                );
+              },
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildAvatar() {
-    return CircleAvatar(
-      radius: 28,
-      backgroundImage: AssetImage('assets/images/img_avatar_56x56.png'),
-      backgroundColor: Colors.grey, // Default color if image is not available
+  void _showOrderDetails(BuildContext context, dynamic order) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Order Details'),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Price: \$${order['items'][0]['price']}'),
+              SizedBox(height: 8.0),
+              Text('Booking Date: ${order['booking_date']}'),
+              SizedBox(height: 8.0),
+              Text('Start Time: ${order['start_time']}'),
+              SizedBox(height: 8.0),
+              Text('End Time: ${order['end_time']}'),
+              SizedBox(height: 8.0),
+              Text('Status: ${order['status']}'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Close'),
+            ),
+          ],
+        );
+      },
     );
   }
 
-  Widget _buildButton(BuildContext context, String text, VoidCallback onPressed) {
-  return ElevatedButton(
-    onPressed: onPressed,
-    style: ElevatedButton.styleFrom(
-      backgroundColor: Colors.blue,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
+  void _payOrder(dynamic order) {
+    final int transactionId = order['transaction_id'];
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PaymentMethodScreen(transactionId: transactionId),
       ),
-    ),
-    child: Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-      child: Text(
-        text,
-        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-      ),
-    ),
-  );
-}
-
+    );
+  }
 }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
 import '../../core/app_export.dart';
 import '../../theme/custom_button_style.dart';
 import '../../widgets/app_bar/appbar_leading_image.dart';
@@ -91,15 +90,6 @@ class _PersonalInfoPageScreenState extends State<PersonalInfoPageScreen> {
     }
   }
 
-  _saveData() async {
-    await _prefs?.setString('username', userSixController.text);
-    await _prefs?.setString('email', emailController.text);
-    await _prefs?.setString('mobile', mobileNumberController.text);
-    await _prefs?.setString('postalCode', pincodeController.text);
-    await _prefs?.setString('city', inputBoxOneController.text);
-    await _prefs?.setString('address', nameController.text);
-  }
-
   _submitData() async {
     showDialog(
       context: context,
@@ -117,8 +107,8 @@ class _PersonalInfoPageScreenState extends State<PersonalInfoPageScreen> {
             TextButton(
               child: Text("Yes"),
               onPressed: () async {
-                await _saveData();
-                _sendDataToApi();
+                await _updateUserData(); // Update SharedPreferences
+                await _sendDataToApi(); // Send data to API
                 Navigator.of(context).pop();
               },
             ),
@@ -128,30 +118,60 @@ class _PersonalInfoPageScreenState extends State<PersonalInfoPageScreen> {
     );
   }
 
-  _sendDataToApi() async {
-    final userId = _prefs?.getString('userId') ?? '';
-    final apiUrl = 'http://localhost:5000/users/$userId';
-    final data = {
-      'username': userSixController.text,
-      'email': emailController.text,
-      'mobileNumber': mobileNumberController.text,
-      'pincode': pincodeController.text,
-      'inputBoxOne': inputBoxOneController.text,
-      'name': nameController.text,
-    };
-
-    final response = await http.put(
-      Uri.parse(apiUrl),
-      body: jsonEncode(data),
-      headers: {'Content-Type': 'application/json'},
+  _updateUserData() async {
+    // Construct User object with updated data
+    User updatedUser = User(
+      id: _prefs?.getInt('id') ?? 0, // Assuming 0 is not a valid ID
+      username: userSixController.text,
+      email: emailController.text,
+      token: _prefs?.getString('token') ?? '',
+      photoUrl: _prefs?.getString('photoUrl') ?? '',
+      mobile: mobileNumberController.text,
+      postalCode: pincodeController.text,
+      city: inputBoxOneController.text,
+      address: nameController.text,
     );
 
-    if (response.statusCode == 200) {
-      print('Data successfully saved on the server.');
-    } else {
-      print('Failed to save data on the server.');
-    }
+    // Save updated data to SharedPreferences
+    await _saveUserDataToPrefs(updatedUser);
   }
+
+_sendDataToApi() async {
+  final userId = _prefs?.getInt('id') ?? 0;
+
+  // Konversi id menjadi integer
+  final intId = int.tryParse(userId.toString()) ?? 0;
+
+  final data = {
+    'username': userSixController.text,
+    'email': emailController.text,
+    'mobileNumber': mobileNumberController.text,
+    'pincode': pincodeController.text,
+    'city': inputBoxOneController.text,
+    'address': nameController.text,
+    'id': intId, // Memasukkan id sebagai integer ke dalam data
+  };
+
+  print('Sending data to API: $data'); // Print the data before sending
+
+  final response = await http.put(
+    Uri.parse('http://10.0.2.2:5000/users/1'), // Menggunakan intId dalam URL
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ${_prefs?.getString('token') ?? ''}',
+    },
+    body: json.encode(data),
+  );
+
+  if (response.statusCode == 200) {
+    print('Data successfully saved on the server.');
+  } else {
+    print('Failed to save data on the server. Status code: ${response.statusCode}, Response body: ${response.body}');
+  }
+}
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -267,14 +287,13 @@ class _PersonalInfoPageScreenState extends State<PersonalInfoPageScreen> {
 
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     return CustomAppBar(
-      height: 107.v,
-      leadingWidth: 48.h,
+      leadingWidth: 44.h,
       leading: AppbarLeadingImage(
-        imagePath: ImageConstant.imgArrowLeftBlack90032x32,
+        imagePath: ImageConstant.imgArrowLeftBlack900,
         margin: EdgeInsets.only(
           left: 16.h,
-          top: 24.v,
-          bottom: 24.v,
+          top: 14.v,
+          bottom: 14.v,
         ),
         onTap: () {
           onTapArrowleftone(context);

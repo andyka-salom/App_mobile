@@ -209,20 +209,6 @@ class SigninScreenOneScreen extends StatelessWidget {
         final loggedInUser = User.fromJson(responseData);
 
         await _saveUserDataToPrefs(loggedInUser);
-
-        final userFromPrefs = await getUserFromPrefs();
-        if (userFromPrefs != null) {
-          print('ID: ${userFromPrefs.id}');
-          print('Username: ${userFromPrefs.username}');
-          print('Email: ${userFromPrefs.email}');
-          print('Token: ${userFromPrefs.token}');
-          print('Photo URL: ${userFromPrefs.photoUrl}');
-          print('Mobile: ${userFromPrefs.mobile ?? "Not Provided"}');
-          print('Postal Code: ${userFromPrefs.postalCode ?? "Not Provided"}');
-          print('City: ${userFromPrefs.city ?? "Not Provided"}');
-          print('Address: ${userFromPrefs.address ?? "Not Provided"}');
-        }
-
         Navigator.pushReplacementNamed(context, '/navbar');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(

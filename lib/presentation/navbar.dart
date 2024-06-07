@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../presentation/page_utama/home.dart';
 import '../presentation/page_utama/service.dart';
@@ -77,21 +77,37 @@ class _NavBarPageState extends State<NavBarPage> {
           currentIndex: _currentPageIndex,
           selectedItemColor: Colors.blue,
           unselectedItemColor: Colors.grey,
-          items: const [
+          items: [
             BottomNavigationBarItem(
-              icon: FaIcon(FontAwesomeIcons.home, size: 24),
+              icon: SvgPicture.asset(
+                'assets/images/img_nav_service.svg',
+                width: 24,
+                height: 24,
+              ),
               label: 'Home',
             ),
             BottomNavigationBarItem(
-              icon: FaIcon(FontAwesomeIcons.toolbox, size: 24),
+              icon: SvgPicture.asset(
+                'assets/images/img_nav_order.svg',
+                width: 24,
+                height: 24,
+              ),
               label: 'Service',
             ),
             BottomNavigationBarItem(
-              icon: FaIcon(FontAwesomeIcons.clock, size: 24),
+              icon: SvgPicture.asset(
+                'assets/images/img_timer_ic.svg',
+                width: 24,
+                height: 24,
+              ),
               label: 'History',
             ),
             BottomNavigationBarItem(
-              icon: FaIcon(FontAwesomeIcons.userCircle, size: 24),
+              icon: SvgPicture.asset(
+                'assets/images/img_user6.svg',
+                width: 24,
+                height: 24,
+              ),
               label: 'Profile',
             ),
           ],

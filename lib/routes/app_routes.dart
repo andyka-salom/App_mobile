@@ -2,16 +2,14 @@ import 'package:flutter/material.dart';
 import '../presentation/page_utama/login.dart';
 import '../presentation/page_utama/registrasi.dart';
 import '../presentation/personal_info_page_screen.dart';
-import '../presentation/serviceadd.dart';
-import '../presentation/service_category.dart';
-import '../presentation/detail_order_screen.dart';
 import '../presentation/page_utama/history.dart' as HistoryPage;
-import '../presentation/order_screen.dart';
 import '../presentation/page_utama/splash_screen.dart'; 
 import '../presentation/page_utama/service.dart';
 import '../presentation/page_utama/home.dart';
 import '../presentation/navbar.dart';
-import '../presentation/page_utama/profile.dart'; // Import ProfilScreen
+import '../presentation/serviceadd.dart';
+import '../presentation/page_utama/profile.dart'; 
+
 
 class AppRoutes {
 
@@ -26,11 +24,12 @@ class AppRoutes {
   // End Page Utama
 
   static const String navbar = "/navbar";
-
+  static const String payment = "/payment";
   static const String orderscreen = '/order_screen';
   static const String newPage = '/detail_order';
   static const String initialRoute = '/initialRoute';
   static const String serviceContainerScreen = '/service_container_screen';
+  static const String serviceadd  = '/serviceadd';
 
   static Map<String, WidgetBuilder> routes = {
     // Halaman utama
@@ -42,13 +41,8 @@ class AppRoutes {
     service_page: (context) => ServicePage(),
     homepage: (context) => HomePage(),
     navbar: (context) => NavBarPage(),
-    // End Halaman utama
-
-    orderscreen: (context) => OrderScreen(),
+    serviceadd: (context) => ServiceAddScreen(),
     '/personal_info': (context) => PersonalInfoPageScreen(),
-    '/serviceadd': (context) => ServiceAddScreen(),
-    '/servicecategory': (context) => ServiceCategoryScreen(),
-    '/detail_order': (context) => DetailOrderScreen(), 
     
     initialRoute: (context) => NavBarPage(),
   };

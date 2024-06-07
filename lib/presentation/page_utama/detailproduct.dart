@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../order_screen.dart';
 
 class DetailProductPage extends StatefulWidget {
   static const routeName = '/detail_product';
@@ -164,9 +165,15 @@ class _DetailProductPageState extends State<DetailProductPage> {
                         ),
                         SizedBox(height: 24),
                         ElevatedButton(
-                          onPressed: () {
-                            // Action when order button is pressed
-                          },
+                            onPressed: () {
+                              // Navigate to OrderScreen and pass the product ID
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => OrderScreen(productId: widget.productId),
+                                ),
+                              );
+                            },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.blue,
                             padding: EdgeInsets.symmetric(vertical: 25),
