@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../payment.dart';
+import '../../config.dart';
 
 class OrderRecentScreen extends StatefulWidget {
   @override
@@ -33,7 +34,7 @@ class _OrderRecentScreenState extends State<OrderRecentScreen> {
   }
 
   Future<void> fetchOrders() async {
-    final response = await http.get(Uri.parse('http://10.0.2.2:5000/transactions/user/$userId'));
+    final response = await http.get(Uri.parse('${Config.baseUrl}/transactions/user/$userId'));
 
     if (response.statusCode == 200) {
       setState(() {
@@ -67,7 +68,7 @@ class _OrderRecentScreenState extends State<OrderRecentScreen> {
                       contentPadding: EdgeInsets.all(16.0),
                       leading: CircleAvatar(
                         radius: 30,
-                        backgroundImage: NetworkImage(order['items'][0]['user_photo']),
+                        backgroundImage: NetworkImage('${Config.profilePhotoUrl}${order['items'][0]['user_photo']}'),
                       ),
                       title: Text(
                         order['items'][0]['product_name'],

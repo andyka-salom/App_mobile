@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../page_utama/detailproduct.dart';
+import '../../config.dart';
 
 class HomePage extends StatefulWidget {
   static const String servicePage = '/service_page';
@@ -44,7 +45,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _fetchCategories() async {
-    final response = await http.get(Uri.parse('http://10.0.2.2:5000/product-categories'));
+    final response = await http.get(Uri.parse('${Config.baseUrl}/product-categories'));
     if (response.statusCode == 200) {
       setState(() {
         _categories = json.decode(response.body);
@@ -56,7 +57,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _fetchProducts(String categoryId) async {
-    final response = await http.get(Uri.parse('http://10.0.2.2:5000/products/category/$categoryId'));
+    final response = await http.get(Uri.parse('${Config.baseUrl}/products/category/$categoryId'));
     if (response.statusCode == 200) {
       setState(() {
         _products = json.decode(response.body);
@@ -111,7 +112,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     CircleAvatar(
                       radius: 30,
-                      backgroundImage: NetworkImage(_userPhotoUrl),
+                      backgroundImage: NetworkImage('${Config.profilePhotoUrl}${_userPhotoUrl}'),
                     ),
                   ],
                 ),
@@ -260,7 +261,7 @@ class _HomePageState extends State<HomePage> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
                       child: Image.network(
-                        user['photo_url'],
+                        '${Config.profilePhotoUrl}${user['photo_url']}',
                         fit: BoxFit.cover,
                       ),
                     ),

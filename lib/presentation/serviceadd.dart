@@ -9,6 +9,7 @@ import '../../widgets/app_bar/custom_app_bar.dart';
 import '../../widgets/custom_elevated_button.dart';
 import '../../widgets/custom_text_form_field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../config.dart';
 class ServiceAddScreen extends StatefulWidget {
   ServiceAddScreen({Key? key}) : super(key: key);
 
@@ -41,7 +42,7 @@ class _ServiceAddScreenState extends State<ServiceAddScreen> {
   }
   // Function to fetch categories from API
   Future<void> _fetchCategories() async {
-    final response = await http.get(Uri.parse('http://10.0.2.2:5000/product-categories'));
+    final response = await http.get(Uri.parse('${Config.baseUrl}/product-categories'));
 
     if (response.statusCode == 200) {
       // If the server returns a 200 OK response, parse the JSON
@@ -78,7 +79,7 @@ void _saveDataAndContinue() {
 Future<void> _sendDataToAPI(Map<String, dynamic> data) async {
   try {
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:5000/products'),
+      Uri.parse('${Config.baseUrl}/products'),
       body: jsonEncode(data),
       headers: {'Content-Type': 'application/json'},
     );

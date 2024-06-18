@@ -10,6 +10,7 @@ import '../../widgets/app_bar/custom_app_bar.dart';
 import '../../widgets/custom_elevated_button.dart';
 import '../../widgets/custom_icon_button.dart';
 import '../../widgets/custom_text_form_field.dart';
+import '../../config.dart';
 
 class User {
   final int id;
@@ -155,7 +156,7 @@ _sendDataToApi() async {
   print('Sending data to API: $data'); // Print the data before sending
 
   final response = await http.put(
-    Uri.parse('http://10.0.2.2:5000/users/1'), // Menggunakan intId dalam URL
+    Uri.parse('${Config.baseUrl}/users/1'), // Menggunakan intId dalam URL
     headers: {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ${_prefs?.getString('token') ?? ''}',
@@ -209,7 +210,7 @@ _sendDataToApi() async {
                         alignment: Alignment.bottomRight,
                         children: [
                           CustomImageView(
-                            imagePath: profilePhotoUrl ?? ImageConstant.imgAvatar,
+                            imagePath: profilePhotoUrl != null ? '${Config.profilePhotoUrl}$profilePhotoUrl' : ImageConstant.imgAvatar,
                             height: 132.adaptSize,
                             width: 132.adaptSize,
                             radius: BorderRadius.circular(66.h),

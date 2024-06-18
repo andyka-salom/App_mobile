@@ -4,6 +4,8 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import '../presentation/payment.dart';
+import '../../config.dart';
+
 class OrderScreen extends StatelessWidget {
   final String productId;
 
@@ -30,43 +32,40 @@ class OrderScreen extends StatelessWidget {
             children: [
               SizedBox(height: 20.0),
               _buildCard(
-                children: [
-                  _buildDatePicker(context),
-                ],
+                title: 'Select Date',
+                child: _buildDatePicker(context),
               ),
               SizedBox(height: 20.0),
               _buildCard(
-                children: [
-                  _buildTimePicker(context, "Start time", startTimeController),
-                  SizedBox(height: 20.0),
-                  _buildTimePicker(context, "End time", endTimeController),
-                ],
+                title: 'Select Time',
+                child: Column(
+                  children: [
+                    _buildTimePicker(context, "Start time", startTimeController),
+                    SizedBox(height: 20.0),
+                    _buildTimePicker(context, "End time", endTimeController),
+                  ],
+                ),
               ),
               SizedBox(height: 30.0),
               Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 35.0),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState?.validate() ?? false) {
-                        // Handle order button pressed
-                        _handleOrder(context);
-                      }
-                    },
-                    style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.all<Color>(Colors.blue),
-                      padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
-                        EdgeInsets.symmetric(vertical: 25.0, horizontal: 120.0), // Sesuaikan dengan preferensi Anda
-                      ),
-                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0), // Ubah sesuai keinginan Anda
-                        ),
-                      ),
+                padding: const EdgeInsets.symmetric(horizontal: 35.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (_formKey.currentState?.validate() ?? false) {
+                      // Handle order button pressed
+                      _handleOrder(context);
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    padding: EdgeInsets.symmetric(vertical: 25.0, horizontal: 100.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0),
                     ),
-                    child: Text('Order', style: TextStyle(color: Colors.white)),
                   ),
+                  child: Text('Order', style: TextStyle(fontSize: 18)),
                 ),
-
+              ),
             ],
           ),
         ),
@@ -74,7 +73,7 @@ class OrderScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCard({required List<Widget> children}) {
+  Widget _buildCard({required String title, required Widget child}) {
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),
@@ -85,7 +84,19 @@ class OrderScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: children,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            child, // Ensure child widget is properly used
+          ],
         ),
       ),
     );
@@ -159,64 +170,65 @@ class OrderScreen extends StatelessWidget {
     _sendOrderDetailsToServer(context);
   }
 
-void _sendOrderDetailsToServer(BuildContext context) async {
-  // Send order details to server
-  final apiUrl = 'http://10.0.2.2:5000/transactions';
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  final userId = prefs.getInt('id') ?? 0;
+  void _sendOrderDetailsToServer(BuildContext context) async {
+    // Send order details to server
+    final apiUrl = '${Config.baseUrl}/transactions';
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getInt('id') ?? 0;
 
-  final DateTime now = DateTime.now();
-  final DateFormat dateFormatter = DateFormat('yyyy-MM-dd');
-  final DateFormat timeFormatter = DateFormat('HH:mm');
+    final DateTime now = DateTime.now();
+    final DateFormat dateFormatter = DateFormat('yyyy-MM-dd');
+    final DateFormat timeFormatter = DateFormat('HH:mm');
 
-  final String bookingDate = dateFormatter.format(now);
-  final String startTime = timeFormatter.format(DateTime.parse('${dateFormatter.format(now)} ${startTimeController.text}'));
-  final String endTime = timeFormatter.format(DateTime.parse('${dateFormatter.format(now)} ${endTimeController.text}'));
-  final int productIdValue = int.tryParse(productId) ?? 0; // Convert to int, use default value 0 if parsing fails
+    final String bookingDate = dateFormatter.format(now);
+    final String startTime =
+        timeFormatter.format(DateTime.parse('${dateFormatter.format(now)} ${startTimeController.text}'));
+    final String endTime =
+        timeFormatter.format(DateTime.parse('${dateFormatter.format(now)} ${endTimeController.text}'));
+    final int productIdValue = int.tryParse(productId) ?? 0; // Convert to int, use default value 0 if parsing fails
 
-  final Map<String, dynamic> payload = {
-    "user_id": userId,
-    "status": "Waiting for Payment",
-    "booking_date": bookingDate,
-    "start_time": startTime,
-    "end_time": endTime,
-    "items": [
-      {
-        "product_id": productIdValue, // Use the converted value
-        "quantity": 1, 
-      }
-    ]
-  };
+    final Map<String, dynamic> payload = {
+      "user_id": userId,
+      "status": "Waiting for Payment",
+      "booking_date": bookingDate,
+      "start_time": startTime,
+      "end_time": endTime,
+      "items": [
+        {
+          "product_id": productIdValue, // Use the converted value
+          "quantity": 1,
+        }
+      ]
+    };
 
-  // Print data payload
-  print('Payload: $payload');
+    // Print data payload
+    print('Payload: $payload');
 
-  final response = await http.post(
-    Uri.parse(apiUrl),
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-    },
-    body: jsonEncode(payload),
-  );
-
-  // Handle response
-  if (response.statusCode == 201) {
-    // Order successful
-    // Extract transaction ID from response
-    final Map<String, dynamic> responseData = jsonDecode(response.body);
-    final int transactionId = responseData['id'];
-
-    // Navigate to another page with transaction ID
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-       builder: (context) => PaymentMethodScreen(transactionId: transactionId),
-      ),
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(payload),
     );
-  } else {
-    // Order failed
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to place order')));
-  }
-}
 
+    // Handle response
+    if (response.statusCode == 201) {
+      // Order successful
+      // Extract transaction ID from response
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
+      final int transactionId = responseData['id'];
+
+      // Navigate to another page with transaction ID
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PaymentMethodScreen(transactionId: transactionId),
+        ),
+      );
+    } else {
+      // Order failed
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to place order')));
+    }
+  }
 }

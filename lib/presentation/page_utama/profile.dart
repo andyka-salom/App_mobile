@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 // import '../page_utama/history.dart';
 // import '../page_utama/home.dart';
 // import '../page_utama/service.dart';
-
+import '../../config.dart';
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({Key? key}) : super(key: key);
 
@@ -37,9 +37,9 @@ class ProfileScreen extends StatelessWidget {
                       child: CircleAvatar(
                         radius: 60,
                         backgroundImage: photoPath != null
-                            ? NetworkImage(photoPath)
-                            : AssetImage('assets/images/default_photo.jpg') as ImageProvider<Object>,
-                      ),
+                              ? NetworkImage('${Config.profilePhotoUrl}${photoPath}')
+                              : AssetImage('assets/images/default_photo.jpg') as ImageProvider<Object>,
+                        ),
                     ),
                     SizedBox(height: 20),
                     Center(

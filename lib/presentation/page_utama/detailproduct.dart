@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../order_screen.dart';
+import '../../config.dart';
 
 class DetailProductPage extends StatefulWidget {
   static const routeName = '/detail_product';
@@ -24,7 +25,7 @@ class _DetailProductPageState extends State<DetailProductPage> {
   }
 
   _fetchProductData(String productId) async {
-    final apiUrl = 'http://10.0.2.2:5000/products/$productId';
+    final apiUrl = '${Config.baseUrl}/products/$productId';
 
     final response = await http.get(Uri.parse(apiUrl));
     if (response.statusCode == 200) {
@@ -72,7 +73,7 @@ class _DetailProductPageState extends State<DetailProductPage> {
                       child: Stack(
                         children: [
                           Image.network(
-                            _productData['user']['photo_url'],
+                            '${Config.profilePhotoUrl}${_productData['user']['photo_url']}',
                             fit: BoxFit.cover,
                           ),
                           Container(

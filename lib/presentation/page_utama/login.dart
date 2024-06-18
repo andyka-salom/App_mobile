@@ -6,6 +6,7 @@ import '../../core/app_export.dart';
 import '../../widgets/custom_checkbox_button.dart';
 import '../../widgets/custom_elevated_button.dart';
 import '../../widgets/custom_text_form_field.dart';
+import '../../config.dart';
 
 class User {
   final int id;
@@ -199,7 +200,7 @@ class SigninScreenOneScreen extends StatelessWidget {
       final password = passwordController.text.trim();
 
       final response = await http.post(
-        Uri.parse('http://10.0.2.2:5000/login'),
+         Uri.parse('${Config.baseUrl}/login'),
         body: json.encode({'email': email, 'password': password}),
         headers: {'Content-Type': 'application/json'},
       );

@@ -5,6 +5,7 @@ import '../../core/app_export.dart';
 import '../../theme/custom_button_style.dart';
 import '../../widgets/custom_elevated_button.dart';
 import '../../widgets/custom_search_view.dart'; 
+import '../../config.dart';
 
 class ServiceCategoryScreen extends StatefulWidget {
   ServiceCategoryScreen({Key? key}) : super(key: key);
@@ -25,7 +26,7 @@ class _ServiceCategoryScreenState extends State<ServiceCategoryScreen> {
   }
 
   Future<void> fetchCategories() async {
-    final response = await http.get(Uri.parse('http://10.0.2.2:5000/product-categories'));
+    final response = await http.get(Uri.parse('${Config.baseUrl}/product-categories'));
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
       setState(() {

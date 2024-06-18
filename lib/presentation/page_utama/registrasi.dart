@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import '../../core/app_export.dart';
 import '../../widgets/custom_checkbox_button.dart';
 import '../../widgets/custom_elevated_button.dart';
+import '../../config.dart';
 import '../../widgets/custom_text_form_field.dart'; // ignore_for_file: must_be_immutable
 
 class SignupPageOneScreen extends StatelessWidget {
@@ -218,7 +219,7 @@ class SignupPageOneScreen extends StatelessWidget {
 
       // Perform registration API call
       final response = await http.post(
-        Uri.parse('http://10.0.2.2:5000/register'),
+        Uri.parse('${Config.baseUrl}/register'),
         body: json.encode({'username': name, 'email': email, 'password': password}),
         headers: {'Content-Type': 'application/json'},
       );

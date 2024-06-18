@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../page_utama/detailproduct.dart';
+import '../../config.dart';
 
 class ServicePage extends StatefulWidget {
   static const String servicePage = '/service_page';
@@ -41,7 +42,7 @@ class _ServicePageState extends State<ServicePage> {
   }
 
   Future<void> _fetchCategories() async {
-    final response = await http.get(Uri.parse('http://10.0.2.2:5000/product-categories'));
+    final response = await http.get(Uri.parse('${Config.baseUrl}/product-categories'));
     if (response.statusCode == 200) {
       setState(() {
         _categories = json.decode(response.body);
@@ -53,7 +54,7 @@ class _ServicePageState extends State<ServicePage> {
   }
 
   Future<void> _fetchProducts(String categoryId) async {
-    final response = await http.get(Uri.parse('http://10.0.2.2:5000/products/category/$categoryId'));
+    final response = await http.get(Uri.parse('${Config.baseUrl}/products/category/$categoryId'));
     if (response.statusCode == 200) {
       setState(() {
         _products = json.decode(response.body);
@@ -237,7 +238,7 @@ class _ServicePageState extends State<ServicePage> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
                       child: Image.network(
-                        user['photo_url'],
+                        '${Config.profilePhotoUrl}${user['photo_url']}',
                         fit: BoxFit.cover,
                       ),
                     ),

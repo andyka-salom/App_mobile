@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import '../presentation/order_history.dart';
+import '../presentation/page_utama/history.dart';
+import '../../config.dart';
 
 class PaymentMethodScreen extends StatefulWidget {
   final int transactionId;
 
   PaymentMethodScreen({Key? key, required this.transactionId}) : super(key: key);
+
   @override
   _PaymentMethodScreenState createState() => _PaymentMethodScreenState();
 }
@@ -14,47 +16,37 @@ class PaymentMethodScreen extends StatefulWidget {
 class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
   bool _showBankOptions = false;
 
- Future<void> _updateTransactionStatus() async {
-  final response = await http.patch(
-    Uri.parse('http://10.0.2.2:5000/transactions/${widget.transactionId}/status'),
-    headers: {'Content-Type': 'application/json'},
-    body: json.encode({'status': 'In Process'}),
-  );
-
-  if (response.statusCode == 200) {
-    // Tampilkan notifikasi pembayaran berhasil
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Payment Success'),
-          content: Text('Your payment has been successfully processed.'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                // Tunggu 5 detik sebelum berpindah ke halaman OrderRecentScreen
-                Future.delayed(Duration(seconds: 5), () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => OrderRecentScreen()),
-                  );
-                });
-              },
-              child: Text('OK'),
-            ),
-          ],
-        );
-      },
+  Future<void> _updateTransactionStatus() async {
+    final response = await http.patch(
+      Uri.parse('${Config.baseUrl}/transactions/${widget.transactionId}/status'),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'status': 'In Process'}),
     );
-  } else {
-    // Handle error
-    print('Failed to update transaction status: ${response.statusCode}');
-    print('Response body: ${response.body}');
-    throw Exception('Failed to update transaction status');
-  }
-}
 
+    if (response.statusCode == 200) {
+      // Show Snackbar for payment success
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Your payment has been successfully processed.'),
+          duration: Duration(seconds: 5),
+          action: SnackBarAction(
+            label: 'OK',
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => OrderRecentScreen()),
+              );
+            },
+          ),
+        ),
+      );
+    } else {
+      // Handle error
+      print('Failed to update transaction status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+      throw Exception('Failed to update transaction status');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -317,9 +309,9 @@ class BankOptionTile extends StatelessWidget {
               style: TextStyle(fontSize: 18),
             ),
             Icon(Icons.arrow_forward_ios, size: 16),
-],
-),
-),
-);
-}
+          ],
+        ),
+      ),
+    );
+  }
 }
